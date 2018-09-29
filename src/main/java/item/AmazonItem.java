@@ -7,10 +7,10 @@ package item;
  * @author anuragjha
  *
  */
-public abstract class AmazonItem implements Item {
+public abstract class AmazonItem {
 
-	protected long itemId;
-	private volatile static long itemCount = 0; //should i synchronize this variable ??? 
+	protected int itemId;
+	private static int itemCount = 0; //should i synchronize this variable ??? 
 
 	/**
 	 * constructor
@@ -20,16 +20,18 @@ public abstract class AmazonItem implements Item {
 		this.incrementCount();
 	}
 
-	
 	/**
 	 * 
 	 */
-	private synchronized void incrementCount()	{
+	private synchronized void incrementCount()	{ //synchronized
 		AmazonItem.itemCount += 1;
 		this.itemId = itemCount;
 	}
 
-
+	/**
+	 * sends the new AmazonObject record to DataStore
+	 */
+	//public abstract void notifyBroker();
 
 	/**
 	 * @param args

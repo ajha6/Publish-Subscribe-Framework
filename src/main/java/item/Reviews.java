@@ -3,6 +3,8 @@
  */
 package item;
 
+import java.util.Arrays;
+
 /**
  * @author anuragjha
  *
@@ -31,6 +33,7 @@ public class Reviews extends AmazonItem {
 	private long unixReviewTime;
 	private String reviewTime;
 
+	private boolean isNew;
 
 
 	/**
@@ -42,40 +45,68 @@ public class Reviews extends AmazonItem {
 
 
 	/**
+	 * @return the isNew
+	 */
+	public boolean isNew() {
+		if(!this.isNew)	{
+			this.setIsNew();
+		}
+		return isNew;
+	}
+
+
+	/**
+	 * @param isNew the isNew to set
+	 */
+	private void setIsNew() {
+		if (this.unixReviewTime >= 1362268800)	{
+			this.isNew = true;
+		}
+		else	{
+			this.isNew = false;
+		}
+	}
+
+
+	/**
+	 * @return the itemId //inherited from AmazonItem Class
+	 */
+	public int getItemId() {
+		return itemId;
+	}
+
+	/**
+	 * sends the new AmazonObject record to DataStore
+	 */
+	//public synchronized void notifyBroker()	{
+		//notify DataStore
+		//AmazonDataStore.ONE.newRecord(this);
+	//	System.out.println("record: " + this.getItemId());
+	//	System.out.println("t: " + Thread.currentThread() + "\n");
+		
+	//}
+	
+	
+	public String toString()	{
+		return "\n ItemId: "+ this.itemId
+				+ "\n\treviewerID: " + this.reviewerID
+				+ "\n\tasin: " + this.asin
+				+ "\n\treviewerName: " + this.reviewerName
+				+ "\n\thelpful: " + Arrays.toString(this.helpful)
+				+ "\n\treviewText: " + this.reviewText
+				+ "\n\toverall: " + this.overall
+				+ "\n\tsummary: " + this.summary
+				+ "\n\tunixReviewTime: " + this.unixReviewTime
+				+ "\n\treviewTime: " + this.reviewTime + "\n";
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
-		Thread t1 = new Thread()	{
-			public void run()	{
-				for(int i = 0; i < 30000; i++)	{
-					System.out.println("ItemId: "+ new Reviews().itemId);
-				}
-			}
-		};
-		
-		Thread t2 = new Thread()	{
-			public void run()	{
-				for(int i = 0; i < 30000; i++)	{
-					System.out.println("ItemId: "+ new Reviews().itemId);
-				}
-			}
-		};
 
-
-		t1.start();
-		t2.start();
-		
-		try	{
-			t1.join();
-			t2.join();
-		}
-		catch(InterruptedException ie)	{
-			System.out.println(ie.getStackTrace());
-		}
-		
-		System.out.println("Complete");
 
 	}
 
