@@ -27,11 +27,13 @@ public class AmazonPublisher implements Runnable {
 	//private ReviewsJsonHandler recordReader;
 	private final String inputFile;
 	private final Broker broker;
+	private boolean readComplete;
 
 	public AmazonPublisher(String inputFile, Broker broker)	{
 		//this.jsonFileReader(inputFile);
 		this.inputFile = inputFile;
 		this.broker = broker;
+		this.readComplete = false;
 
 		//this.jsonFileReader(this.inputFile);
 	}
@@ -41,7 +43,7 @@ public class AmazonPublisher implements Runnable {
 	 * jsonFileReader process Review file and then notifies DataStore 
 	 * @param inputFile
 	 */
-	private  void jsonFileReader(String inputFile)	{
+	private synchronized void jsonFileReader(String inputFile)	{
 
 		JsonParser parser = new JsonParser();
 		Path path = Paths.get(inputFile);	
@@ -68,7 +70,9 @@ public class AmazonPublisher implements Runnable {
 					System.out.println("Skipping line ...");
 				}
 			}	
-
+			
+			this.readComplete = true;
+			
 		}	catch(IOException ioe)	{
 			System.out.println("Could not process Review file");
 			System.out.println("Exiting System");
@@ -80,9 +84,9 @@ public class AmazonPublisher implements Runnable {
 
 
 	public void run()	{
-		//while(true)	{
+
 			this.jsonFileReader(this.inputFile);
-		//}
+
 	}
 
 	/**

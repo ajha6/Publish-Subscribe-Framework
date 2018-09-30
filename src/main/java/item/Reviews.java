@@ -47,7 +47,7 @@ public class Reviews extends AmazonItem {
 	/**
 	 * @return the isNew
 	 */
-	public boolean isNew() {
+	public synchronized boolean isNew() {
 		if(!this.isNew)	{
 			this.setIsNew();
 		}
@@ -71,7 +71,7 @@ public class Reviews extends AmazonItem {
 	/**
 	 * @return the itemId //inherited from AmazonItem Class
 	 */
-	public int getItemId() {
+	public synchronized int getItemId() {
 		return itemId;
 	}
 

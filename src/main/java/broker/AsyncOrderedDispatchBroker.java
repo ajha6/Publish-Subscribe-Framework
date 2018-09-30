@@ -6,8 +6,10 @@ package broker;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import item.Reviews;
+import publisher.AmazonPublisher;
 import subscriber.Subscriber;
 
 /**
@@ -16,18 +18,18 @@ import subscriber.Subscriber;
  */
 public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable { 
 
-	//have to implement singleton and then change statement in Reviews class
 	private static AsyncOrderedDispatchBroker INSTANCE;
-	private CircularBlockingQueue<T> dispatcher; 
-	private LinkedList<Subscriber> subscribied; 
+
+	private LinkedList<Subscriber> subscribied = new LinkedList<Subscriber>();
+	private LinkedList<AmazonPublisher> publisherList = new LinkedList<AmazonPublisher>();
+
+	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(100);
 
 	ExecutorService threadPool;
-
 	//constructor
 	private AsyncOrderedDispatchBroker()	{
-		this.dispatcher = new CircularBlockingQueue<T>(500000);
-		this.subscribied = new LinkedList<Subscriber>();
-		//this.threadPool = Executors.newFixedThreadPool(8);
+		threadPool = Executors.newFixedThreadPool(2);
+		threadPool.execute(this);
 	}
 
 	public static synchronized AsyncOrderedDispatchBroker getInstance()	{
@@ -37,14 +39,6 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 		return INSTANCE;
 	}
 
-	
-	
-	/**
-	 * @return the dispatcher
-	 */
-	public synchronized CircularBlockingQueue<T> getDispatcher() {
-		return dispatcher;
-	}
 
 	/**
 	 * Called by a publisher to publish a new item. The 
@@ -57,21 +51,47 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 		//System.out.println("t: " + Thread.currentThread() + "\n");
 		processNewRecord(item);
 
+
+	}
+
+	/**
+	 * processNewRecord method implements update of Review dispatcher for each new Record
+	 * @param newRecord
+	 */
+	private synchronized void processNewRecord(T newRecord)	{
+
+		this.dispatcher.put(newRecord);
+		//T item1 = this.dispatcher.take();
+		//T item1 = this.dispatcher.take();
+		//System.out.println("record: " + ((Reviews)item1).getItemId());
+		//System.out.println("t: " + Thread.currentThread());
+		//for(Subscriber s : this.subscribied)	{
+		//	s.onEvent(item1);
+		//s.onEvent(newRecord);
+		//}
+
 	}
 
 	/**
 	 * processNewRecord method implements update of Review DataStores for each new Record
 	 * @param newRecord
 	 */
-	private void processNewRecord(T newRecord)	{
+	public synchronized T takeFromDispatcher()	{
+		//return dispatcher.take();
+		return dispatcher.take();
 
-		this.dispatcher.put(newRecord);
+	}
 
-		//for(Subscriber s : this.subscribied)	{
-		//	s.onEvent(newRecord);
-		//}
-		
 
+	/**
+	 * Called once by each subscriber. Subscriber will be 
+	 * registered and receive notification of all future
+	 * published items.
+	 * 
+	 * @param subscriber
+	 */
+	public synchronized void subscribe(Subscriber<T> subscriber)	{
+		this.subscribied.add(subscriber);
 	}
 
 	/**
@@ -81,8 +101,8 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 	 * 
 	 * @param subscriber
 	 */
-	public void subscribe(Subscriber<T> subscriber)	{
-		this.subscribied.add(subscriber);
+	public synchronized void publisherRegister(AmazonPublisher publisher)	{
+		this.publisherList.add(publisher);
 	}
 
 	/**
@@ -91,22 +111,39 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 	 * The method will block until all items that have been
 	 * published have been delivered to all subscribers.
 	 */
-	public void shutdown()	{
+	public synchronized void shutdown()	{
+		threadPool.shutdown();
 
-	}
-
-
-	public void distribute()	{
-		T newRecord = this.dispatcher.take();
-		for(Subscriber s : this.subscribied)	{
-			s.onEvent(newRecord);
+		try {
+			while(!threadPool.awaitTermination(2, TimeUnit.MINUTES))	{
+				System.out.println("awaiting termination");
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public void run() {
-		
+		while(true)	{
+			
+			//T item1 = this.takeFromDispatcher();
+			//	if(item1 == null)	{
+			//		threadPool.shutdown();
+			//	}
+			//synchronized(this)	{
+				//T item1 = this.dispatcher.take();
+			T item1 = this.dispatcher.take();
+				for(Subscriber s : this.subscribied)	{
+					s.onEvent(item1);
+					//s.onEvent(newRecord);
+				}
+		//	}
+		}
+
 	}
+
+
 
 	/**
 	 * @param args

@@ -18,7 +18,10 @@ public class Subscribers<T> implements Subscriber<T>,Runnable {
 	private String filter;
 
 	public int recordCount = 0;
-
+	//private boolean firstItemReceived = false;
+	//private boolean isOnEvent;
+	//private T item;
+	
 	public Subscribers()	{
 		count += 1;
 		subscriberId = count;
@@ -35,14 +38,15 @@ public class Subscribers<T> implements Subscriber<T>,Runnable {
 	}
 
 	public synchronized void onEvent(T item)	{
-		System.out.println("onEvent in Subscriber" + this.subscriberId);
-		System.out.println("t: "+ Thread.activeCount() );
+		//System.out.println("onEvent in Subscriber" + this.subscriberId);
+		//System.out.println("t: "+ Thread.activeCount() );
 		/// creating new object every time !!!!!!
+		
 		toOutput(item);
-
+		
 	}
 
-	public void toOutput(T item)	{
+	private void toOutput(T item)	{
 		if(this.filter.matches("new") && ((Reviews)item).isNew())	{
 
 			outputFile.addContent(item.toString());
@@ -54,17 +58,17 @@ public class Subscribers<T> implements Subscriber<T>,Runnable {
 		}
 	}
 
-	public synchronized void keepChecking()	{
-		T i = (T) AsyncOrderedDispatchBroker.getInstance().getDispatcher().take();
-		this.toOutput(i);
-	}
 
 	@Override
 	public void run() {
-		while(true)	{
-			this.keepChecking();
-		}
-
+		//after 1st object received, in a true while - start polling --- so after the value - 
+		// NUll is received break out of the loop
+		
+	//	while(true)	{
+			
+	//	}
+		
+		
 
 	}
 

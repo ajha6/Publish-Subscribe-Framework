@@ -4,35 +4,35 @@
 package broker;
 
 import java.util.LinkedList;
+import java.util.concurrent.SynchronousQueue;
 
 import item.Reviews;
 import subscriber.Subscriber;
-import subscriber.Subscribers;
 
 /**
  * @author anuragjha
  *
  */
 public class SynchronousOrderedDispatchBroker<T> implements Broker<T>,Runnable { 
-	
-	//have to implement singleton and then change statement in Reviews class
+
 	private static SynchronousOrderedDispatchBroker INSTANCE;
+
 	private LinkedList<Subscriber> subscribied = new LinkedList<Subscriber>();
-	
-	//private boolean ;
-	
+
+	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(1);
+
 	//constructor
 	private SynchronousOrderedDispatchBroker()	{
 	}
-	
+
 	public static synchronized SynchronousOrderedDispatchBroker getInstance()	{
 		if(INSTANCE == null)	{
 			INSTANCE = new SynchronousOrderedDispatchBroker<Reviews>();
 		}
 		return INSTANCE;
 	}
-	
-	
+
+
 	/**
 	 * Called by a publisher to publish a new item. The 
 	 * item will be delivered to all current subscribers.
@@ -43,23 +43,33 @@ public class SynchronousOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 		//System.out.println("record: " + item);
 		//System.out.println("t: " + Thread.currentThread() + "\n");
 		processNewRecord(item);
-		
-		
+
+
 	}
-	
+
 	/**
 	 * processNewRecord method implements update of Review DataStores for each new Record
 	 * @param newRecord
 	 */
 	private void processNewRecord(T newRecord)	{
-		//dispatcher.put(newRecord);
-		
+
+		this.dispatcher.put(newRecord);
+		T item1 = this.dispatcher.take();
+		//System.out.println("record: " + ((Reviews)item1).getItemId());
+		//System.out.println("t: " + Thread.currentThread());
 		for(Subscriber s : this.subscribied)	{
-			s.onEvent(newRecord);
+			s.onEvent(item1);
+			//s.onEvent(newRecord);
 		}
 
 	}
-	
+
+	public T takeFromDispatcher()	{
+		return dispatcher.take();
+
+	}
+
+
 	/**
 	 * Called once by each subscriber. Subscriber will be 
 	 * registered and receive notification of all future
@@ -70,7 +80,7 @@ public class SynchronousOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 	public void subscribe(Subscriber<T> subscriber)	{
 		this.subscribied.add(subscriber);
 	}
-	
+
 	/**
 	 * Indicates this broker should stop accepting new
 	 * items to be published and shut down all threads.
@@ -78,15 +88,15 @@ public class SynchronousOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 	 * published have been delivered to all subscribers.
 	 */
 	public void shutdown()	{
-		
+
 	}
-	
+
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	/**
 	 * @param args
 	 */
