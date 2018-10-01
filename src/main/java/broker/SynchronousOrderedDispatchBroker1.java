@@ -13,28 +13,26 @@ import subscriber.Subscriber;
  * @author anuragjha
  *
  */
-public class SynchronousOrderedDispatchBroker<T> implements Broker<T>,Runnable { 
+public class SynchronousOrderedDispatchBroker1<T> implements Broker<T>,Runnable { 
 
-	private static SynchronousOrderedDispatchBroker INSTANCE;
+	private static SynchronousOrderedDispatchBroker1 INSTANCE;
 
 	private LinkedList<Subscriber> subscribied = new LinkedList<Subscriber>();
 
 	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(1);
 
 	//constructor
-	private SynchronousOrderedDispatchBroker()	{
+	private SynchronousOrderedDispatchBroker1()	{
 	}
 
-	public static synchronized SynchronousOrderedDispatchBroker getInstance()	{
+	public static synchronized SynchronousOrderedDispatchBroker1 getInstance()	{
 		if(INSTANCE == null)	{
-			INSTANCE = new SynchronousOrderedDispatchBroker<Reviews>();
+			INSTANCE = new SynchronousOrderedDispatchBroker1<Reviews>();
 		}
 		return INSTANCE;
 	}
 
-	public synchronized void produce(T item)	{
-		this.publish(item);
-	}
+
 
 	/**
 	 * Called by a publisher to publish a new item. The 
@@ -54,21 +52,22 @@ public class SynchronousOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 	 * processNewRecord method implements update of Review DataStores for each new Record
 	 * @param newRecord
 	 */
-	private void processNewRecord(T newRecord)	{
+	private synchronized void processNewRecord(T newRecord)	{
 
 		this.dispatcher.put(newRecord);
-		T item1 = this.dispatcher.take();
-		//System.out.println("record: " + ((Reviews)item1).getItemId());
-		//System.out.println("t: " + Thread.currentThread());
-		for(Subscriber s : this.subscribied)	{
-			s.onEvent(item1);
-			//s.onEvent(newRecord);
-		}
+		///////////////////////////////this.dispatcher.take();
+
+		//	T item = this.dispatcher.take();
+		//	System.out.println("in processNewRecord");
+		//	for(Subscriber s : this.subscribied)	{
+		//		System.out.println("in processNewRecord");
+		//		s.onEvent(item);
+		//	}
 
 	}
 
-	public T takeFromDispatcher()	{
-		return dispatcher.take();
+	public synchronized T takeFromDispatcher()	{
+		return this.dispatcher.take();
 
 	}
 
@@ -80,7 +79,7 @@ public class SynchronousOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 	 * 
 	 * @param subscriber
 	 */
-	public void subscribe(Subscriber<T> subscriber)	{
+	public synchronized void subscribe(Subscriber<T> subscriber)	{
 		this.subscribied.add(subscriber);
 	}
 
@@ -96,8 +95,12 @@ public class SynchronousOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-
+		while(true)	{
+			T item = this.dispatcher.take();
+			for(Subscriber s : this.subscribied)	{
+				s.onEvent(item);
+			}
+		}
 	}
 
 	/**
