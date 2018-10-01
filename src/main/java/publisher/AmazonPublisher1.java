@@ -67,7 +67,7 @@ public class AmazonPublisher1 implements Runnable {
 					Reviews newReview = new Gson().fromJson(object, Reviews.class);
 					//new Review record notifies the data Store to process it
 					//+++ instead of this -->   newReview.notifyBroker();
-					
+
 					//broker.publish(newReview);
 					this.produce(newReview);
 					//System.out.println("review: " + newReview);
@@ -77,9 +77,9 @@ public class AmazonPublisher1 implements Runnable {
 					System.out.println("Skipping line ...");
 				}
 			}	
-			
+
 			this.isReadComplete = true;
-			
+
 		}	catch(IOException ioe)	{
 			System.out.println("Could not process Review file");
 			System.out.println("Exiting System");
@@ -95,7 +95,7 @@ public class AmazonPublisher1 implements Runnable {
 
 	public void run()	{
 		//while(true)	{
-			this.jsonFileReader(this.inputFile);
+		this.jsonFileReader(this.inputFile);
 		//}
 	}
 
@@ -103,29 +103,7 @@ public class AmazonPublisher1 implements Runnable {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
-		ExecutorService threadPool = Executors.newFixedThreadPool(6);
-		
-		SynchronousOrderedDispatchBroker1<Reviews> broker = 
-				SynchronousOrderedDispatchBroker1.getInstance();
-		
-		String[] inputFileArray = {"reviews_Apps_for_Android_5_copy.json",
-		"reviews_Home_and_Kitchen_5_copy.json"};
-		
-		Subscribers1 s1 = new Subscribers1("new");
-		broker.subscribe(s1);
-		Subscribers1 s2 = new Subscribers1("old");
-		broker.subscribe(s2);
-		//Subscribers1 s3 = new Subscribers1("new");
-		//broker.subscribe(s3);
-		
-		threadPool.execute(broker);
-		threadPool.execute(s1);
-		threadPool.execute(s2);
-		//threadPool.execute(s3);
-		for(String file : inputFileArray)	{
-			threadPool.execute(new AmazonPublisher1(file, broker));
-		}
+
 	}
 
 }

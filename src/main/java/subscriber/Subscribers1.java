@@ -40,6 +40,7 @@ public class Subscribers1<T> implements Subscriber<T>,Runnable {
 	public synchronized void onEvent(T item)	{
 		this.item = item;
 		this.isEvent = true;
+		toOutput(this.item); /// move this to run()
 
 
 	}
@@ -64,16 +65,16 @@ public class Subscribers1<T> implements Subscriber<T>,Runnable {
 		//after 1st object received, in a true while - start polling --- so after the value - 
 		// NUll is received break out of the loop
 
-		while(true)	{
-			synchronized(this)	{
-				if(this.isEvent)	{
-					toOutput(this.item);
-					this.isEvent = false;
-					System.out.println("in blablabla: "+ this.item);
-				}
-			}
-
-		}
+	//	while(true)	{
+	//		synchronized(this)	{
+	//			if(this.isEvent)	{
+	//				toOutput(this.item);
+	//				this.isEvent = false;
+	//				System.out.println("in blablabla: "+ this.item);
+	//			}
+	//		}
+//
+	//	}
 
 
 

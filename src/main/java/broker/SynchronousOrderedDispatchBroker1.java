@@ -55,6 +55,7 @@ public class SynchronousOrderedDispatchBroker1<T> implements Broker<T>,Runnable 
 	private synchronized void processNewRecord(T newRecord)	{
 
 		this.dispatcher.put(newRecord);
+		//System.out.println("putting in dispatcher: "+ newRecord.toString());
 		///////////////////////////////this.dispatcher.take();
 
 		//	T item = this.dispatcher.take();
