@@ -37,7 +37,7 @@ public class AmazonPublisher1 implements Runnable {
 		//this.jsonFileReader(inputFile);
 		this.inputFile = inputFile;
 		this.broker = broker;
-		this.isReadComplete = false;
+		//this.isReadComplete = false;
 
 		//this.jsonFileReader(this.inputFile);
 	}
@@ -67,7 +67,7 @@ public class AmazonPublisher1 implements Runnable {
 					Reviews newReview = new Gson().fromJson(object, Reviews.class);
 					//new Review record notifies the data Store to process it
 					//+++ instead of this -->   newReview.notifyBroker();
-
+					
 					//broker.publish(newReview);
 					this.produce(newReview);
 					//System.out.println("review: " + newReview);
@@ -77,9 +77,6 @@ public class AmazonPublisher1 implements Runnable {
 					System.out.println("Skipping line ...");
 				}
 			}	
-
-			this.isReadComplete = true;
-
 		}	catch(IOException ioe)	{
 			System.out.println("Could not process Review file");
 			System.out.println("Exiting System");

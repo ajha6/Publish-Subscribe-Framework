@@ -21,14 +21,15 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 	private static AsyncOrderedDispatchBroker INSTANCE;
 
 	private LinkedList<Subscriber> subscribied = new LinkedList<Subscriber>();
-	private LinkedList<AmazonPublisher> publisherList = new LinkedList<AmazonPublisher>();
 
 	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(100);
 
+	public int recordCounter = 0;
+	
 	ExecutorService threadPool;
 	//constructor
 	private AsyncOrderedDispatchBroker()	{
-		threadPool = Executors.newFixedThreadPool(2);
+		threadPool = Executors.newFixedThreadPool(1);
 		threadPool.execute(this);
 	}
 
@@ -61,6 +62,7 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 	private synchronized void processNewRecord(T newRecord)	{
 
 		this.dispatcher.put(newRecord);
+		this.recordCounter += 1;
 		//T item1 = this.dispatcher.take();
 		//T item1 = this.dispatcher.take();
 		//System.out.println("record: " + ((Reviews)item1).getItemId());
@@ -94,16 +96,6 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 		this.subscribied.add(subscriber);
 	}
 
-	/**
-	 * Called once by each subscriber. Subscriber will be 
-	 * registered and receive notification of all future
-	 * published items.
-	 * 
-	 * @param subscriber
-	 */
-	public synchronized void publisherRegister(AmazonPublisher publisher)	{
-		this.publisherList.add(publisher);
-	}
 
 	/**
 	 * Indicates this broker should stop accepting new

@@ -29,8 +29,6 @@ public interface Broker<T> {
 	public void subscribe(Subscriber<T> subscriber);
 	
 	
-	public T takeFromDispatcher();
-	
 	/**
 	 * Indicates this broker should stop accepting new
 	 * items to be published and shut down all threads.

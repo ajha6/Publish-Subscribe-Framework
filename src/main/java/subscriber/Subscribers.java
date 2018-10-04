@@ -10,7 +10,7 @@ import item.Reviews;
  * @author anuragjha
  *
  */
-public class Subscribers<T> implements Subscriber<T>,Runnable {
+public class Subscribers<T> implements Subscriber<T> {
 
 	private static int count = 0;
 	private FileOutput outputFile;
@@ -56,20 +56,6 @@ public class Subscribers<T> implements Subscriber<T>,Runnable {
 			outputFile.addContent(item.toString());
 			this.recordCount += 1;
 		}
-	}
-
-
-	@Override
-	public void run() {
-		//after 1st object received, in a true while - start polling --- so after the value - 
-		// NUll is received break out of the loop
-		
-	//	while(true)	{
-			
-	//	}
-		
-		
-
 	}
 
 	/**
