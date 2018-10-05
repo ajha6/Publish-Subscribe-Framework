@@ -46,9 +46,8 @@ public class Subscribers1<T> implements Subscriber<T> {
 		
 	}
 
-	private void toOutput(T item)	{
+	private synchronized void toOutput(T item)	{
 		if(this.filter.matches("new") && ((Reviews)item).isNew())	{
-
 			outputFile.addContent(item.toString());
 			this.recordCount += 1;
 		} else if(this.filter.matches("old") && !((Reviews)item).isNew())	{

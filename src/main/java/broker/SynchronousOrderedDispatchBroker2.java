@@ -21,7 +21,7 @@ public class SynchronousOrderedDispatchBroker2<T> implements Broker<T> {
 
 	//private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(1);
 	
-	public int recordCounter = 0;
+	private int recordCounter = 0;
 
 	//constructor
 	private SynchronousOrderedDispatchBroker2()	{
@@ -34,7 +34,14 @@ public class SynchronousOrderedDispatchBroker2<T> implements Broker<T> {
 		return INSTANCE;
 	}
 
-
+	
+	
+	/**
+	 * @return the recordCounter
+	 */
+	public int getRecordCounter() {
+		return recordCounter;
+	}
 
 	/**
 	 * Called by a publisher to publish a new item. The 

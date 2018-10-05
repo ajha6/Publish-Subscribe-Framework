@@ -5,7 +5,7 @@ package cs601.project2;
 
 import java.util.LinkedList;
 
-import broker.AsyncUnorderedDispatchBroker;
+import broker.AsyncOrderedDispatchBroker;
 import item.Reviews;
 import publisher.AmazonPublisher1;
 import subscriber.Subscribers1;
@@ -25,24 +25,29 @@ public class AppTester {
 		long start = System.currentTimeMillis();
 
 
-		//SynchronousOrderedDispatchBroker2<Reviews> broker = 
-		//		SynchronousOrderedDispatchBroker2.getInstance();
-		
-		//AsyncOrderedDispatchBroker<Reviews> broker = AsyncOrderedDispatchBroker.getInstance();
-		
-		AsyncUnorderedDispatchBroker<Reviews> broker = AsyncUnorderedDispatchBroker.getInstance();
-
-		String[] inputFileArray = {"reviews_Apps_for_Android_5.json",
-		"reviews_Home_and_Kitchen_5.json"};
+		String[] inputFileArray = {"reviews_Apps_for_Android_5_copy.json",
+		"reviews_Home_and_Kitchen_5_copy.json"};
 
 		
 		Subscribers1 s1 = new Subscribers1("new");
-		broker.subscribe(s1);
+		
 		Subscribers1 s2 = new Subscribers1("old");
-		broker.subscribe(s2);
-		//Subscribers1 s3 = new Subscribers1("new");
-		//broker.subscribe(s3);
+		
+		Subscribers1 s3 = new Subscribers1("new");
+		
 
+		
+		//SynchronousOrderedDispatchBroker2<Reviews> broker = 
+		//		SynchronousOrderedDispatchBroker2.getInstance();
+		
+		AsyncOrderedDispatchBroker<Reviews> broker = AsyncOrderedDispatchBroker.getInstance();
+		
+		//AsyncUnorderedDispatchBroker<Reviews> broker = AsyncUnorderedDispatchBroker.getInstance();
+		
+		
+		broker.subscribe(s1);
+		broker.subscribe(s2);
+		broker.subscribe(s3);
 		
 		LinkedList<Thread> threadList = new LinkedList<>();
 		for(String file : inputFileArray)	{
@@ -55,7 +60,7 @@ public class AppTester {
 		for(Thread t: threadList) {
 			t.start();
 		}
-		
+		System.out.println("Initial thread count : " + Thread.activeCount());
 		for(Thread t: threadList) {
 			try {
 				t.join();
@@ -63,12 +68,16 @@ public class AppTester {
 				e.printStackTrace();
 			}
 		}
-	
+		broker.shutdown();
+		
+		
 		long end = System.currentTimeMillis(); //retrieve current time when finishing calculations
 		System.out.println("time: " + (end-start)/1000);
-		System.out.println("no of records into dispatcher: " + broker.recordCounter);
+		System.out.println("no of records into dispatcher: " + broker.getRecordCounter());
 		System.out.println("no of records in subs1: " + s1.recordCount);
 		System.out.println("no of records in subs2: " + s2.recordCount);
+		System.out.println("no of records in subs3: " + s3.recordCount);
+		
 
 
 	}

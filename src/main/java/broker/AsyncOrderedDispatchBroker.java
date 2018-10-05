@@ -22,10 +22,10 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 
 	private LinkedList<Subscriber> subscribied = new LinkedList<Subscriber>();
 
-	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(100);
+	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(1);
 
-	public int recordCounter = 0;
-	
+	private int recordCounter = 0;
+
 	ExecutorService threadPool;
 	//constructor
 	private AsyncOrderedDispatchBroker()	{
@@ -38,6 +38,14 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 			INSTANCE = new AsyncOrderedDispatchBroker<Reviews>();
 		}
 		return INSTANCE;
+	}
+
+
+	/**
+	 * @return the recordCounter
+	 */
+	public int getRecordCounter() {
+		return recordCounter;
 	}
 
 
@@ -104,35 +112,41 @@ public class AsyncOrderedDispatchBroker<T> implements Broker<T>,Runnable {
 	 * published have been delivered to all subscribers.
 	 */
 	public synchronized void shutdown()	{
+		System.out.println("shutting down");
+		System.out.println(Thread.activeCount());
 		threadPool.shutdown();
-
+		
 		try {
-			while(!threadPool.awaitTermination(2, TimeUnit.MINUTES))	{
+			while(!threadPool.awaitTermination(1, TimeUnit.MINUTES))	{
 				System.out.println("awaiting termination");
 			}
 		} catch (InterruptedException e) {
+			System.out.println("interrupted Exception");
+			threadPool.shutdownNow();
 			e.printStackTrace();
 		}
+		
 	}
 
 	@Override
 	public void run() {
 		while(true)	{
-			
+
 			//T item1 = this.takeFromDispatcher();
 			//	if(item1 == null)	{
 			//		threadPool.shutdown();
 			//	}
-			//synchronized(this)	{
-				//T item1 = this.dispatcher.take();
-			T item1 = this.dispatcher.take();
+			//synchronized()	{
+			//T item1 = this.dispatcher.take();
+			T item1 = this.dispatcher.poll();
+			
 				for(Subscriber s : this.subscribied)	{
 					s.onEvent(item1);
 					//s.onEvent(newRecord);
 				}
-		//	}
+			
+			//}
 		}
-
 	}
 
 

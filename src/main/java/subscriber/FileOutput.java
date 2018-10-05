@@ -43,7 +43,7 @@ public class FileOutput {
 	 * @param mycontent
 	 * @return true/false
 	 */
-	public void addContent(String mycontent)	{
+	public synchronized void addContent(String mycontent)	{
 
 		BufferedWriter bw = null;
 		//FileWriter fw;

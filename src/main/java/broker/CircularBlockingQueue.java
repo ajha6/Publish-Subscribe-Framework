@@ -3,7 +3,7 @@
  */
 package broker;
 
-import org.junit.rules.Timeout;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author anuragjha
@@ -86,17 +86,21 @@ public class CircularBlockingQueue<T> {
 
 	/**
 	 * Retrieves and removes the head of this queue, waiting up to the specified wait time 
-	 * if necessary for an element to become available.
+	 * if necessary for an element to become available and returns null if the queue is still empty.
 	 * @return
 	 */
 	public synchronized T poll()	{
 
 		if(this.size == 0)	{
 			try	{
-				this.wait(200);
+				this.wait(2000);
 			} catch (InterruptedException ie)	{
 				System.out.println("Cannot read from dispatcher");
 			}
+		}
+		
+		if(this.size == 0)	{
+			return null;
 		}
 
 		T item = this.itemQueue[start];
@@ -106,6 +110,7 @@ public class CircularBlockingQueue<T> {
 		if(this.size == (this.itemQueue.length - 1))	{
 			this.notifyAll();
 		}
+
 		return item;
 
 	}

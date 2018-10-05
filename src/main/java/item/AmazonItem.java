@@ -17,14 +17,21 @@ public abstract class AmazonItem {
 	 */
 	public AmazonItem()	{
 		super();
-		this.incrementCount();
+
+			this.incrementCount();
 	}
 
+	
+	private synchronized int getItemCount()	{
+		return itemCount;
+	}
+	
+	
 	/**
 	 * 
 	 */
 	private synchronized void incrementCount()	{ //synchronized
-		AmazonItem.itemCount += 1;
+		AmazonItem.itemCount = this.getItemCount() + 1;
 		this.itemId = itemCount;
 	}
 

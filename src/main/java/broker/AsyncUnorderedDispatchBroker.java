@@ -21,9 +21,9 @@ public class AsyncUnorderedDispatchBroker<T> implements Broker<T>,Runnable {
 
 	private LinkedList<Subscriber> subscribied = new LinkedList<Subscriber>();
 
-	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(100);
+	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(1);
 
-	public int recordCounter = 0;
+	private int recordCounter = 0;
 	
 	ExecutorService threadPool;
 	//constructor
@@ -40,6 +40,14 @@ public class AsyncUnorderedDispatchBroker<T> implements Broker<T>,Runnable {
 	}
 
 
+	/**
+	 * @return the recordCounter
+	 */
+	public int getRecordCounter() {
+		return recordCounter;
+	}
+	
+	
 	/**
 	 * Called by a publisher to publish a new item. The 
 	 * item will be delivered to all current subscribers.
@@ -114,6 +122,7 @@ public class AsyncUnorderedDispatchBroker<T> implements Broker<T>,Runnable {
 		}
 	}
 
+	
 	@Override
 	public void run() {
 		while(true)	{
