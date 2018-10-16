@@ -15,40 +15,79 @@ import subscriber.Subscriber;
  * @author anuragjha
  *
  */
-public class AsyncUnorderedDispatchBroker<T> implements Broker<T>,Runnable { 
+public class AsyncUnorderedDispatchBroker1<T> implements Broker<T>,Runnable { 
 
-	private static AsyncUnorderedDispatchBroker INSTANCE;
+	private static AsyncUnorderedDispatchBroker1 INSTANCE;
 
 	private LinkedList<Subscriber> subscribied = new LinkedList<Subscriber>();
 
-	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(5000);
+	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(100);
+	/////////T newItem;
+
+	ExecutorService helperPool;
 
 	private int recordCounter = 0;
 	private boolean isReadComplete = false;
 	private boolean isWriteComplete = false;
 	private int maxQueueSize = 0;
 
-	ExecutorService threadPool;
-	//constructor
-	private AsyncUnorderedDispatchBroker()	{
-		this.initializeThreadPool();
+	/**
+	 * @return the dispatcher
+	 */
+	public CircularBlockingQueue<T> getDispatcher() {
+		return dispatcher;
 	}
 
-	public static synchronized AsyncUnorderedDispatchBroker getInstance()	{
+	/**
+	 * @return the newItem
+	 */
+	//public synchronized T getNewItem() {
+	//	return newItem;
+	//}
+
+	/**
+	 * @param newItem the newItem to set
+	 */
+	//public synchronized void setNewItem(T newItem) {
+	//	this.newItem = newItem;
+	//}
+
+	/**
+	 * @return the subscribied
+	 */
+	public LinkedList<Subscriber> getSubscribied() {
+		return subscribied;
+	}
+
+
+
+
+
+	//private AsyncOrderedBrokerHelper helper = new AsyncOrderedBrokerHelper();
+
+	//constructor
+	private AsyncUnorderedDispatchBroker1()	{
+		//helperPool = Executors.newFixedThreadPool(5);
+	}
+
+	public static synchronized AsyncUnorderedDispatchBroker1 getInstance()	{
 		if(INSTANCE == null)	{
-			INSTANCE = new AsyncUnorderedDispatchBroker<Reviews>();
+			INSTANCE = new AsyncUnorderedDispatchBroker1<Reviews>();
 		}
 		return INSTANCE;
 	}
 
-	public synchronized void initializeThreadPool()	{
-		threadPool = Executors.newFixedThreadPool(20);
-		//return threadPool;
-		threadPool.execute(this);
+	public synchronized void initializeHelperPool(int poolSize)	{
 		//System.out.println("async unordered broker Initial thread count : " + Thread.activeCount());
+		this.helperPool = Executors.newFixedThreadPool(poolSize);
+		//for(int i = 1; i <= poolSize; i++)	{
+		//	helperPool.execute(new AsyncUnOrderedBrokerHelper());
+		//}
+		System.out.println("async unordered broker Initial thread count : " + Thread.activeCount());
+
 	}
-	
-	
+
+
 	/**
 	 * @return the recordCounter
 	 */
@@ -59,7 +98,7 @@ public class AsyncUnorderedDispatchBroker<T> implements Broker<T>,Runnable {
 	public int getMaxQueueSize()	{
 		return this.maxQueueSize;
 	}
-	
+
 
 	/**
 	 * @param isReadComplete the isReadComplete to set
@@ -68,53 +107,55 @@ public class AsyncUnorderedDispatchBroker<T> implements Broker<T>,Runnable {
 		this.isReadComplete = isReadComplete;
 	}
 
-	
+
 	/**
 	 * @return the isWriteComplete
 	 */
 	public boolean isWriteComplete() {
 		return isWriteComplete;
 	}
-	
-	
+
+
 	/**
 	 * Called by a publisher to publish a new item. The 
 	 * item will be delivered to all current subscribers.
 	 * 
 	 * @param item
-	 */
+	 */ 
 	public synchronized void publish(T item)	{
 		//System.out.println("record: " + item);
 		//System.out.println("t: " + Thread.currentThread() + "\n");
-		processNewRecord(item);
-
-
-	}
-
-	/**
-	 * processNewRecord method implements update of Review dispatcher for each new Record
-	 * @param newRecord
-	 */
-	private synchronized void processNewRecord(T newRecord)	{
+		//processNewRecord(item);
 
 		//System.out.println("async unordered broker current thread : " + Thread.currentThread());
-		
-		int newSize = this.dispatcher.getSize();
-		if(this.maxQueueSize < newSize)	{
-			this.maxQueueSize = newSize;
-		}
+		//////this.dispatcher.put(item);
+		//this.newItem = item;
 		this.recordCounter += 1;
-		this.dispatcher.put(newRecord);
-		//T item1 = this.dispatcher.take();
-		//T item1 = this.dispatcher.take();
-		//System.out.println("record: " + ((Reviews)item1).getItemId());
-		//System.out.println("t: " + Thread.currentThread());
-		//for(Subscriber s : this.subscribied)	{
-		//	s.onEvent(item1);
-		//s.onEvent(newRecord);
-		//}
+		helperPool.execute(new AsyncUnOrderedBrokerHelper(item, this.subscribied));
+
+		// threadpool.execute(helperThread);
+
+
 
 	}
+	/**
+	public synchronized void publish(T item)	{
+		//System.out.println("record: " + item);
+		//System.out.println("t: " + Thread.currentThread() + "\n");
+		//processNewRecord(item);
+
+		//System.out.println("async unordered broker current thread : " + Thread.currentThread());
+		this.dispatcher.put(item);
+		//this.newItem = item;
+		this.recordCounter += 1;
+		helperPool.execute(new AsyncUnOrderedBrokerHelper());
+
+		// threadpool.execute(helperThread);
+
+
+
+	}
+**/
 
 	/**
 	 * 
@@ -148,57 +189,34 @@ public class AsyncUnorderedDispatchBroker<T> implements Broker<T>,Runnable {
 		System.out.println("shutting down");
 		System.out.println(Thread.activeCount());
 
+		this.helperPool.shutdown();
 
-		
-		if(this.threadPool.isTerminated())	{
+		//if(this.helperPool.isTerminated())	{
 			try {
-				while(!this.threadPool.awaitTermination(2, TimeUnit.MINUTES))	{
+				while(!this.helperPool.awaitTermination(2, TimeUnit.MINUTES))	{
 					System.out.println("awaiting termination");
 				}
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				System.out.println("Error in closing helper pool");
 			}
-		}
+		//}
 		this.isWriteComplete = true;
 	}
 
 
 	@Override
 	public void run() {
-		System.out.println("in async unordered run method");
-		while(!this.isReadComplete)	{
+		//System.out.println("in async unordered run method");
 
-			//T item1 = this.takeFromDispatcher();
-			//	if(item1 == null)	{
-			//		threadPool.shutdown();
-			//	}
-			//synchronized()	{
-			//T item1 = this.dispatcher.take();
+		this.initializeHelperPool(500);
 
-			//if(!this.dispatcher.isEmpty())	{
-			while((!this.dispatcher.isEmpty())) 	{
-				T item1 = this.dispatcher.poll(200);
-				for(Subscriber s : this.subscribied)	{
-					s.onEvent(item1);
-					//s.onEvent(newRecord);
-				}
-			} 
-			//}
-		}
-		this.threadPool.shutdown();
-		while((!this.dispatcher.isEmpty())) 	{
-			T item1 = this.dispatcher.poll(200);
-			for(Subscriber s : this.subscribied)	{
-				s.onEvent(item1);
-			}
-		}
-		this.shutdown();
-		
-		//while(!this.threadPool.isTerminated())	{
-		//	System.out.println("awaiting thread to complete its task");
-		//	System.out.println("current thread: " + Thread.currentThread().getName());
+		//try {
+		//	this.wait();
+		//}catch(InterruptedException ie)	{
+		//	ie.printStackTrace();
 		//}
-		//this.shutdown();
+
+
 
 	}
 

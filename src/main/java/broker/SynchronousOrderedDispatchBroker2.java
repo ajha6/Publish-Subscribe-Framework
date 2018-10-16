@@ -22,6 +22,7 @@ public class SynchronousOrderedDispatchBroker2<T> implements Broker<T> {
 	//private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(1);
 	
 	private int recordCounter = 0;
+	private boolean isReadComplete = false;
 
 	//constructor
 	private SynchronousOrderedDispatchBroker2()	{
@@ -34,7 +35,12 @@ public class SynchronousOrderedDispatchBroker2<T> implements Broker<T> {
 		return INSTANCE;
 	}
 
-	
+	/**
+	 * @param isReadComplete the isReadComplete to set
+	 */
+	public void setReadComplete(boolean isReadComplete) {
+		this.isReadComplete = isReadComplete;
+	}
 	
 	/**
 	 * @return the recordCounter

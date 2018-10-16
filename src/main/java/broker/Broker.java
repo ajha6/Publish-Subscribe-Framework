@@ -10,7 +10,7 @@ import subscriber.Subscriber;
  *
  */
 public interface Broker<T> {
-
+	
 	/**
 	 * Called by a publisher to publish a new item. The 
 	 * item will be delivered to all current subscribers.

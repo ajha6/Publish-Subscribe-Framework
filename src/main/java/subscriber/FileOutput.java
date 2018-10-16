@@ -15,7 +15,9 @@ import java.io.IOException;
 public class FileOutput {
 
 	File file;
-
+	///BufferedWriter bw = null;
+	//FileWriter fw;
+	
 	public FileOutput(String outFile)	{
 		this.file = new File(outFile);
 
@@ -32,7 +34,7 @@ public class FileOutput {
 		catch(IOException ioe) {
 			ioe.printStackTrace();
 		}
-
+		
 	}
 
 

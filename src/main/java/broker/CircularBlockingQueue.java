@@ -25,6 +25,12 @@ public class CircularBlockingQueue<T> {
 
 	}
 
+	
+	public synchronized int getSize()	{
+		return this.size;
+	}
+	
+	
 	/**
 	 * put method tries to put item in the queue, if the queue is full 
 	 * then it tells the thread to wait
@@ -89,11 +95,11 @@ public class CircularBlockingQueue<T> {
 	 * if necessary for an element to become available and returns null if the queue is still empty.
 	 * @return
 	 */
-	public synchronized T poll()	{
+	public synchronized T poll(long time)	{
 
 		if(this.size == 0)	{
 			try	{
-				this.wait(2000);
+				this.wait(time);
 			} catch (InterruptedException ie)	{
 				System.out.println("Cannot read from dispatcher");
 			}

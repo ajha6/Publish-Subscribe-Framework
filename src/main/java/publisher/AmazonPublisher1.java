@@ -9,8 +9,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -18,9 +16,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import broker.Broker;
-import broker.SynchronousOrderedDispatchBroker1;
 import item.Reviews;
-import subscriber.Subscribers1;
 
 /**
  * @author anuragjha
@@ -31,7 +27,7 @@ public class AmazonPublisher1 implements Runnable {
 	//private ReviewsJsonHandler recordReader;
 	private final String inputFile;
 	private final Broker broker;
-	private boolean isReadComplete;
+	
 
 	public AmazonPublisher1(String inputFile, Broker broker)	{
 		//this.jsonFileReader(inputFile);
@@ -63,7 +59,7 @@ public class AmazonPublisher1 implements Runnable {
 				try {
 					//parses each line into JsonObject
 					JsonObject object =  parser.parse(line).getAsJsonObject();
-					//creates AmazonReviews object from the Json Object
+					//creates AmazonReviews object from the Json Object 
 					Reviews newReview = new Gson().fromJson(object, Reviews.class);
 					//new Review record notifies the data Store to process it
 					//+++ instead of this -->   newReview.notifyBroker();

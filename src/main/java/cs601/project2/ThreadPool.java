@@ -30,7 +30,6 @@ public class ThreadPool {
 
 //////--------////////$$$$$$$$$$$$$$    threadPool.execute();			
 
-
 		/* TBD: shutdown executor service */
 		threadPool.shutdown();
 		try {

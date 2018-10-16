@@ -16,6 +16,7 @@ public class Subscribers1<T> implements Subscriber<T> {
 	private FileOutput outputFile;
 	private int subscriberId;
 	private String filter;
+	
 
 	public int recordCount = 0;
 	//private boolean firstItemReceived = false;
@@ -39,7 +40,7 @@ public class Subscribers1<T> implements Subscriber<T> {
 
 	public synchronized void onEvent(T item)	{
 		//System.out.println("onEvent in Subscriber" + this.subscriberId);
-		//System.out.println("t: "+ Thread.activeCount() );
+		//System.out.println("t: "+ Thread.currentThread() );
 		/// creating new object every time !!!!!!
 		
 		toOutput(item);
@@ -47,11 +48,11 @@ public class Subscribers1<T> implements Subscriber<T> {
 	}
 
 	private synchronized void toOutput(T item)	{
+		//System.out.println("current thread in subscriber: " + Thread.currentThread().getName());
 		if(this.filter.matches("new") && ((Reviews)item).isNew())	{
 			outputFile.addContent(item.toString());
 			this.recordCount += 1;
 		} else if(this.filter.matches("old") && !((Reviews)item).isNew())	{
-
 			outputFile.addContent(item.toString());
 			this.recordCount += 1;
 		}
@@ -62,7 +63,7 @@ public class Subscribers1<T> implements Subscriber<T> {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Subscribers s = new Subscribers();
+	
 
 	}
 

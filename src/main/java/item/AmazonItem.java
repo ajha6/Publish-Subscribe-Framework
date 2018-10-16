@@ -3,6 +3,8 @@
  */
 package item;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author anuragjha
  *
@@ -10,7 +12,8 @@ package item;
 public abstract class AmazonItem {
 
 	protected int itemId;
-	private static int itemCount = 0; //should i synchronize this variable ??? 
+	private volatile static int itemCount = 0; 
+	private ReentrantLock lock = new ReentrantLock();
 
 	/**
 	 * constructor
@@ -22,17 +25,22 @@ public abstract class AmazonItem {
 	}
 
 	
-	private synchronized int getItemCount()	{
-		return itemCount;
-	}
+	//private synchronized int getItemCount()	{
+		
+	//	return itemCount;
+		
+	//}
 	
 	
 	/**
 	 * 
 	 */
 	private synchronized void incrementCount()	{ //synchronized
-		AmazonItem.itemCount = this.getItemCount() + 1;
-		this.itemId = itemCount;
+		lock.lock();
+		AmazonItem.itemCount = AmazonItem.itemCount + 1;
+		this.itemId = AmazonItem.itemCount;
+		//System.out.println("itemId: " + this.itemId);
+		lock.unlock();
 	}
 
 	/**

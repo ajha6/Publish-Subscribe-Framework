@@ -10,7 +10,7 @@ import java.util.Arrays;
  *
  */
 public class Reviews extends AmazonItem {
-
+	//public class Reviews {
 	/*
 	{"reviewerID": "A1N4O8VOJZTDVB", 
 		"asin": "B004A9SDD8", 
@@ -32,6 +32,9 @@ public class Reviews extends AmazonItem {
 	private String summary;
 	private long unixReviewTime;
 	private String reviewTime;
+
+	//private int itemId;
+	//private volatile static int itemCount = 0; 
 
 	private boolean isNew;
 
@@ -79,15 +82,15 @@ public class Reviews extends AmazonItem {
 	 * sends the new AmazonObject record to DataStore
 	 */
 	//public synchronized void notifyBroker()	{
-		//notify DataStore
-		//AmazonDataStore.ONE.newRecord(this);
+	//notify DataStore
+	//AmazonDataStore.ONE.newRecord(this);
 	//	System.out.println("record: " + this.getItemId());
 	//	System.out.println("t: " + Thread.currentThread() + "\n");
-		
+
 	//}
-	
-	
-	public String toString()	{
+
+
+	public synchronized String toString()	{
 		return "\n ItemId: "+ this.itemId
 				+ "\n\treviewerID: " + this.reviewerID
 				+ "\n\tasin: " + this.asin
