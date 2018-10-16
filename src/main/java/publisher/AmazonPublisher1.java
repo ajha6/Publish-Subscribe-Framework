@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -16,31 +17,31 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import broker.Broker;
+import cs601.project2.Project2Logger;
 import item.Reviews;
 
 /**
+ * AmazonPublisher1 implements Publisher functionality
  * @author anuragjha
- *
  */
 public class AmazonPublisher1 implements Runnable {
 
-	//private ReviewsJsonHandler recordReader;
 	private final String inputFile;
 	private final Broker broker;
 	
-
+	/**
+	 * Publisher constructor
+	 * @param inputFile
+	 * @param broker
+	 */
 	public AmazonPublisher1(String inputFile, Broker broker)	{
-		//this.jsonFileReader(inputFile);
 		this.inputFile = inputFile;
 		this.broker = broker;
-		//this.isReadComplete = false;
-
-		//this.jsonFileReader(this.inputFile);
 	}
 
 
 	/**
-	 * jsonFileReader process Review file and then notifies DataStore 
+	 * jsonFileReader process Review file and then publish method of Broker 
 	 * @param inputFile
 	 */
 	private synchronized void jsonFileReader(String inputFile)	{
@@ -52,23 +53,19 @@ public class AmazonPublisher1 implements Runnable {
 		try(
 				BufferedReader reader = Files.newBufferedReader(path, Charset.forName("ISO-8859-1"))
 				)	{
+			
 			String line;
-			System.out.println("Processing " + inputFile + " file.");
-
+			//System.out.println("Processing " + inputFile + " file.");
+			Project2Logger.write(Level.INFO, "Processing " + inputFile + " file.", 0);
 			while((line = reader.readLine()) != null)	{
 				try {
 					//parses each line into JsonObject
 					JsonObject object =  parser.parse(line).getAsJsonObject();
 					//creates AmazonReviews object from the Json Object 
 					Reviews newReview = new Gson().fromJson(object, Reviews.class);
-					//new Review record notifies the data Store to process it
-					//+++ instead of this -->   newReview.notifyBroker();
+					//calling publish method of Broker
+					broker.publish(newReview);
 					
-					//broker.publish(newReview);
-					this.produce(newReview);
-					//System.out.println("review: " + newReview);
-					//broker.publish(newReview);
-
 				} catch(JsonSyntaxException jse)	{
 					System.out.println("Skipping line ...");
 				}
@@ -81,15 +78,9 @@ public class AmazonPublisher1 implements Runnable {
 
 	}
 
-
-	private synchronized void produce(Reviews newReview)	{
-		broker.publish(newReview);
-	}
-
+	
 	public void run()	{
-		//while(true)	{
 		this.jsonFileReader(this.inputFile);
-		//}
 	}
 
 	/**

@@ -39,7 +39,7 @@ public class Project2InitReader {
 				BufferedReader reader = Files.newBufferedReader(path, Charset.forName("ISO-8859-1"))
 				)	{
 			String line;
-			System.out.println("Processing " + "project2Init.json" + " file.");
+			//System.out.println("Processing " + "project2Init.json" + " file.");
 
 			while((line = reader.readLine()) != null)	{
 				try {

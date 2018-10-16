@@ -17,7 +17,15 @@ public class FileOutput {
 	File file;
 	///BufferedWriter bw = null;
 	//FileWriter fw;
-	
+
+	/**
+	 * @return the file
+	 */
+	public File getFile() {
+		return file;
+	}
+
+
 	public FileOutput(String outFile)	{
 		this.file = new File(outFile);
 
@@ -34,7 +42,7 @@ public class FileOutput {
 		catch(IOException ioe) {
 			ioe.printStackTrace();
 		}
-		
+
 	}
 
 
@@ -45,36 +53,24 @@ public class FileOutput {
 	 * @param mycontent
 	 * @return true/false
 	 */
-	public synchronized void addContent(String mycontent)	{
+	public synchronized void addContent(String mycontent, BufferedWriter bw)	{
 
-		BufferedWriter bw = null;
+		//////////////BufferedWriter bw = null;
 		//FileWriter fw;
 
 		try {
 
 
-			FileWriter fw = new FileWriter(this.file,true);
-			bw = new BufferedWriter(fw);
+			/////////FileWriter fw = new FileWriter(this.file,true);
+			/////////bw = new BufferedWriter(fw);
 			//bw.write(mycontent); 
 			bw.append(mycontent);    
 			//System.out.println("File written Successfully");
-			
+
 		}
 		catch (IOException ioe) {
 			System.out.println(ioe.getMessage() );
-			
-		}
-		finally	{
-			try{
-				if(bw != null)	{
-					bw.close();
-				}
-				//if(fw != null)	{
-				//	fw.close();
-				//}
-			}catch(Exception e){
-				System.out.println("Error in closing BufferedWriter");
-			}
+
 		}
 	}
 

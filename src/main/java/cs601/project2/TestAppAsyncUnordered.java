@@ -4,8 +4,9 @@
 package cs601.project2;
 
 import java.util.LinkedList;
+import java.util.logging.Level;
 
-import broker.AsyncUnorderedDispatchBroker1;
+import broker.AsyncUnorderedBroker;
 import item.Reviews;
 import publisher.AmazonPublisher1;
 import subscriber.Subscribers1;
@@ -21,103 +22,87 @@ public class TestAppAsyncUnordered {
 	 */
 	public static void main(String[] args) {
 
-		System.out.println("project2");
+		System.out.println("Project2 - Asynchronous Unordered Broker Test App");
+		//reading configuration file content into Project2Init object
+		Project2Init init = Project2InitReader.project2InitjsonReader();
+
+		//initializing logger 
+		Project2Logger.initialize("Asynchronous Unordered Broker Test App", init.getLoggerFile());
 
 		long start = System.currentTimeMillis();
 
-		String[] inputFileArray = {"reviews_Apps_for_Android_5.json",
-		"reviews_Home_and_Kitchen_5.json"};
-
+		//String[] inputFileArray = {"reviews_Apps_for_Android_5.json",
+		//"reviews_Home_and_Kitchen_5.json"};
 
 		Subscribers1 s1 = new Subscribers1("new");
 		Subscribers1 s2 = new Subscribers1("old");
-		//Subscribers1 s3 = new Subscribers1("new");
 
+		AsyncUnorderedBroker<Reviews> broker = AsyncUnorderedBroker.getInstance();
 
-
-		//SynchronousOrderedDispatchBroker2<Reviews> broker = 
-		//		SynchronousOrderedDispatchBroker2.getInstance();
-
-		//AsyncOrderedDispatchBroker1<Reviews> broker = AsyncOrderedDispatchBroker1.getInstance();
-		//AsyncOrderedBrokerHelper helper = new AsyncOrderedBrokerHelper();
-
-		AsyncUnorderedDispatchBroker1<Reviews> broker = AsyncUnorderedDispatchBroker1.getInstance();
-
-		//broker.initializeThreadPool();
-		//System.out.println("Initial broker thread count : " + broker.threadCount());
+		//registering subscribers
 		broker.subscribe(s1);
 		broker.subscribe(s2);
-		//broker.subscribe(s3);
 
-		LinkedList<Thread> threadList = new LinkedList<>();
-		for(String file : inputFileArray)	{
-			//AmazonPublisher1 publisher = new AmazonPublisher1(file, broker);
-			Thread t = new Thread(new AmazonPublisher1(file, broker));
-			threadList.add(t);
-
+		//creating AmazonPublisher1 thread for each input file
+		LinkedList<Thread> publisherThreadList = new LinkedList<>();
+		for(String file : init.getInputFiles())	{
+			Thread publisherThread = new Thread(new AmazonPublisher1(file, broker));
+			publisherThreadList.add(publisherThread);
 		}
+		
+		//creating broker thread
 		Thread brokerThread = new Thread(broker);
 		
-		
-		//broker.initializeHelperPool(5);
-		
-		for(Thread t: threadList) {
-			t.start();
-		}
+		//starting broker thread
 		brokerThread.start();
 		
-	//	try {
-	//		System.out.println("broker thread waiting");
-	//		brokerThread.wait();
-	//	} catch (InterruptedException e) {
-	//		e.printStackTrace();
-	//	}
+		//starting publisher threads 
+		for(Thread publisherThread: publisherThreadList) {
+			publisherThread.start();
+		}
 		
-		System.out.println(" thread count : " + Thread.activeCount());
 		
-		for(Thread t: threadList) {
+		
+		//waiting for publisher threads to complete
+		for(Thread publisherThread: publisherThreadList) {
 			try {
-				System.out.println("waiting for Publishers to finish: ");
-				t.join();
+				
+				publisherThread.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("Publisher threads finished.");
+		Project2Logger.write(Level.INFO, "Publisher threads finished.", 0);
 		
+		//shutting down broker
 		broker.shutdown();
-		
-		//***** shutdown *****
+				
 		try {
-			System.out.println("broker to finish");
+			
 			brokerThread.join();
 		} catch (InterruptedException ie) {
 			System.out.println("Error in closing broker");
 		}
-		//******
-
-		//broker.setReadComplete(true);
-		//broker.shutdown();
-		//System.out.println("inter broker count : " + broker.threadCount());
-		//while(!broker.isWriteComplete())	{
-
-		//}
-		//broker.shutdown();
-		//while(!broker.isWriteComplete())	{
-		//	try {
-		//		Thread.sleep(200);
-		//	} catch (InterruptedException e) {
-		//		System.out.println("Write not complete");
-		//	}
-	//	}
+		System.out.println("Broker thread finished.");
+		Project2Logger.write(Level.INFO, "Broker thread finished.", 0);
+		
+		//closing subscriber resources
+		s1.closeWriter();
+		s2.closeWriter();
 
 		long end = System.currentTimeMillis(); //retrieve current time when finishing calculations
-		System.out.println("time: " + (end-start)/1000);
-		System.out.println("no of records into dispatcher: " + broker.getRecordCounter());
-		System.out.println("no of records in subs1: " + s1.recordCount);
-		System.out.println("no of records in subs2: " + s2.recordCount);
-		//System.out.println("no of records in subs3: " + s3.recordCount);
-		//System.out.println("MAx queue size was: " + broker.getMaxQueueSize());
+		System.out.println("Time taken: " + (end-start)/1000 + " seconds");
+		Project2Logger.write(Level.INFO, "Time taken: " + (end-start)/1000 + " seconds", 0);
+		//System.out.println("No of records read: " + broker.getRecordCounter());
+		Project2Logger.write(Level.INFO, "No of records read: " + broker.getRecordCounter(), 0);
+		//System.out.println("Total records in subs1: " + s1.recordCount);
+		Project2Logger.write(Level.INFO, "Total records in subs1: " + s1.recordCount, 0);
+		//System.out.println("Total records in subs2: " + s2.recordCount);
+		Project2Logger.write(Level.INFO, "Total records in subs2: " + s2.recordCount, 0);
 		
+		//closing logger
+		Project2Logger.close();
 
 
 	}

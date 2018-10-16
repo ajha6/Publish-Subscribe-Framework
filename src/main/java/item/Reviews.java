@@ -6,23 +6,12 @@ package item;
 import java.util.Arrays;
 
 /**
+ * Reviews class stores the data read from the input Review files
  * @author anuragjha
  *
  */
 public class Reviews extends AmazonItem {
-	//public class Reviews {
-	/*
-	{"reviewerID": "A1N4O8VOJZTDVB", 
-		"asin": "B004A9SDD8", 
-		"reviewerName": "Annette Yancey", 
-		"helpful": [1, 1], 
-		"reviewText": "Loves the song, so he really couldn't wait to play this. A little less interesting for him so he doesn't play long, but he is almost 3 and likes to play the older games, but really cute for a younger child.", 
-		"overall": 3.0, 
-		"summary": "Really cute", 
-		"unixReviewTime": 1383350400, 
-		"reviewTime": "11 2, 2013"
-			}
-	 */
+
 	private String reviewerID;
 	private String asin;
 	private String reviewerName;
@@ -33,9 +22,7 @@ public class Reviews extends AmazonItem {
 	private long unixReviewTime;
 	private String reviewTime;
 
-	//private int itemId;
-	//private volatile static int itemCount = 0; 
-
+	//variable to understand if the review is new or old
 	private boolean isNew;
 
 
@@ -48,7 +35,8 @@ public class Reviews extends AmazonItem {
 
 
 	/**
-	 * @return the isNew
+	 * isNew method returns if the Review is new or old 
+	 * @return the isNew (true / false)
 	 */
 	public synchronized boolean isNew() {
 		if(!this.isNew)	{
@@ -58,8 +46,9 @@ public class Reviews extends AmazonItem {
 	}
 
 
+	
 	/**
-	 * @param isNew the isNew to set
+	 * setIsNew method checks and sets the isNew state of Review
 	 */
 	private void setIsNew() {
 		if (this.unixReviewTime >= 1362268800)	{
@@ -72,24 +61,17 @@ public class Reviews extends AmazonItem {
 
 
 	/**
-	 * @return the itemId //inherited from AmazonItem Class
+	 * @return itemId
 	 */
 	public synchronized int getItemId() {
 		return itemId;
 	}
 
-	/**
-	 * sends the new AmazonObject record to DataStore
+	
+	/** 
+	 * toString method of Object class
+	 * @override
 	 */
-	//public synchronized void notifyBroker()	{
-	//notify DataStore
-	//AmazonDataStore.ONE.newRecord(this);
-	//	System.out.println("record: " + this.getItemId());
-	//	System.out.println("t: " + Thread.currentThread() + "\n");
-
-	//}
-
-
 	public synchronized String toString()	{
 		return "\n ItemId: "+ this.itemId
 				+ "\n\treviewerID: " + this.reviewerID

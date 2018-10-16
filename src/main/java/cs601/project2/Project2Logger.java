@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
 
 /**
  * @author anuragjha
@@ -16,6 +18,7 @@ public class Project2Logger {
 
 	private static Logger logger; 
 	private static FileHandler logHandler;
+	private static SimpleFormatter readableFormat = new SimpleFormatter();
 	
 
 	/**
@@ -32,20 +35,26 @@ public class Project2Logger {
 		
 		try	{
 			logHandler = new FileHandler(logFile);	
+			
 		} catch(IOException ioe)	{
 			System.out.println("Error while acquiring the file handler for the logger");
 		}
 		
+		logHandler.setFormatter(readableFormat);
+		
 		logger.addHandler(logHandler);
 
-		logger.log(Level.INFO, "Logger Name: " + logName + "\tLogFile" + logFile, 0);
+		logger.log(Level.INFO, "Logger Name: " + logName + "   |    LogFile: " + logFile, 0);
 		
 
 	}
 	
+	public static void write(Level level, String msg, int thrown)	{
+		logger.log(level, msg, thrown);
+	}
+	
 	public static void close()	{
 		logHandler.close();
-		
 	}
 	
 	

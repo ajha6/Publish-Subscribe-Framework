@@ -6,47 +6,35 @@ package item;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * AmazonItem is base class for Reviews class
  * @author anuragjha
- *
  */
 public abstract class AmazonItem {
 
 	protected int itemId;
 	private volatile static int itemCount = 0; 
-	private ReentrantLock lock = new ReentrantLock();
+	//private ReentrantLock lock = new ReentrantLock();
 
 	/**
 	 * constructor
 	 */
 	public AmazonItem()	{
 		super();
-
-			this.incrementCount();
+		this.incrementCount();
 	}
 
-	
-	//private synchronized int getItemCount()	{
-		
-	//	return itemCount;
-		
-	//}
-	
-	
+
 	/**
-	 * 
+	 * incrementCount method increments the recordCounter and assigns the value to itemId
 	 */
 	private synchronized void incrementCount()	{ //synchronized
-		lock.lock();
+		//lock.lock();
 		AmazonItem.itemCount = AmazonItem.itemCount + 1;
 		this.itemId = AmazonItem.itemCount;
 		//System.out.println("itemId: " + this.itemId);
-		lock.unlock();
+		//lock.unlock();
 	}
 
-	/**
-	 * sends the new AmazonObject record to DataStore
-	 */
-	//public abstract void notifyBroker();
 
 	/**
 	 * @param args

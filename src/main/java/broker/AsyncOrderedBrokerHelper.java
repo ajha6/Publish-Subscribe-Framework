@@ -12,8 +12,8 @@ public class AsyncOrderedBrokerHelper implements Runnable {
 		//subscriber list
 		System.out.println("run of helper");
 		Object item;
-		while((item = AsyncOrderedDispatchBroker1.getInstance().getDispatcher().poll(1000)) != null) {
-			LinkedList<Subscriber> subscribers = AsyncOrderedDispatchBroker1.getInstance().getSubscriberList();
+		while((item = AsyncOrderedBroker.getInstance().getDispatcher().poll(1000)) != null) {
+			LinkedList<Subscriber> subscribers = AsyncOrderedBroker.getInstance().getSubscriberList();
 			for(Subscriber s : subscribers)	{
 				
 				s.onEvent(item);
