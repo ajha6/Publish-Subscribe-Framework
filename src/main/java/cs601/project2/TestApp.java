@@ -119,10 +119,6 @@ public class TestApp {
 
 
 	private void closeBroker(Broker broker, Thread brokerThread)	{
-//		if(init.getBrokerType().matches("asyncUnordered"))	{
-//			//shutting down broker
-//			broker.shutdown();
-//		}
 
 		if(init.getBrokerType().matches("asyncOrdered") || init.getBrokerType().matches("asyncUnordered"))	{
 			broker.shutdown();

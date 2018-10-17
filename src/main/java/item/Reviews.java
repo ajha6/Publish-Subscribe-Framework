@@ -73,8 +73,8 @@ public class Reviews extends AmazonItem {
 	 * @override
 	 */
 	public synchronized String toString()	{
-		return "\n ItemId: "+ this.itemId
-				+ "\n\treviewerID: " + this.reviewerID
+		return "\n ItemId: "+ this.itemId +
+			 "\n\treviewerID: " + this.reviewerID
 				+ "\n\tasin: " + this.asin
 				+ "\n\treviewerName: " + this.reviewerName
 				+ "\n\thelpful: " + Arrays.toString(this.helpful)

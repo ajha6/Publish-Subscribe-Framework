@@ -13,15 +13,15 @@ import subscriber.Subscriber;
 public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 
 	private static AsyncOrderedBroker INSTANCE;
-	
+
 	public LinkedList<Subscriber> subscriberList; 
 	private CircularBlockingQueue<T> dispatcher; 
-	
+
 	private AsyncOrderedBrokerHelper helper; 
 	private Thread helperThread;
-	
+
 	private int recordCounter; 
-	
+
 	/**
 	 * constructor - initializes the resources needed
 	 */
@@ -31,21 +31,21 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 		this.helper = new AsyncOrderedBrokerHelper();
 		this.recordCounter = 0;		
 	}
-	
-	
+
+
 	public static synchronized AsyncOrderedBroker getInstance()	{
 		return INSTANCE;
 	}
-	
-	
+
+
 	public static synchronized AsyncOrderedBroker getInstance(int queueSize)	{
 		if(INSTANCE == null)	{
-			
+
 			INSTANCE = new AsyncOrderedBroker<Reviews>(queueSize);
 		}
 		return INSTANCE;
 	}
-	
+
 	/**
 	 * @return the subscriberList
 	 */
@@ -61,14 +61,14 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 		return dispatcher;
 	}
 
-	
+
 	/**
 	 * @return the recordCounter
 	 */
 	public int getRecordCounter() {
 		return recordCounter;
 	}
-	
+
 
 	/**
 	 * Called by a publisher to publish a new item. The 
@@ -78,10 +78,12 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	 */
 	public void publish(T item)	{
 		this.dispatcher.put(item);
-		this.recordCounter += 1;
+		synchronized(this)	{
+			this.recordCounter += 1;
+		}
 	}
-	
-	
+
+
 	/**
 	 * Called once by each subscriber. Subscriber will be 
 	 * registered and receive notification of all future
@@ -92,8 +94,8 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	public void subscribe(Subscriber<T> subscriber)	{
 		this.subscriberList.add(subscriber);
 	}
-	
-	
+
+
 	/**
 	 * Indicates this broker should stop accepting new
 	 * items to be published and shut down all threads.
@@ -103,29 +105,29 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	public void shutdown()	{
 		System.out.println("shutting down Async Ordered Broker");
 		try	{
-		this.helperThread.join();
+			this.helperThread.join();
 		}catch(InterruptedException ie)	{
 			System.out.println("Error in closing helper thread");
 		}
 	}
-	
+
 	/**
 	 * run method creates and starts new helper thread
 	 */
 	public void run()	{
-		
+
 		this.helperThread = new Thread(new AsyncOrderedBrokerHelper());
 		this.helperThread.start();
-		
-		
+
+
 	}
-	
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		
+
 		//Subscriber s = (Subscriber) AsyncOrderedDispatchBroker1.getInstance().getSubscriberList();
-			
-		
+
+
 	}
 
 }

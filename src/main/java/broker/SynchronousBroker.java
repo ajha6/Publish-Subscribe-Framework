@@ -17,15 +17,17 @@ public class SynchronousBroker<T> implements Broker<T> {
 
 	private static SynchronousBroker INSTANCE;
 
-	private LinkedList<Subscriber> subscribied = new LinkedList<Subscriber>();
+	private LinkedList<Subscriber> subscribied;
 
 	//private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(1);
-	
-	private int recordCounter = 0;
+
+	private int recordCounter;
 	//private boolean isReadComplete = false;
 
 	//constructor
 	private SynchronousBroker()	{
+		this.subscribied = new LinkedList<Subscriber>();
+		this.recordCounter = 0;
 	}
 
 	public static synchronized SynchronousBroker getInstance()	{
@@ -41,7 +43,7 @@ public class SynchronousBroker<T> implements Broker<T> {
 	//public void setReadComplete(boolean isReadComplete) {
 	//	this.isReadComplete = isReadComplete;
 	//}
-	
+
 	/**
 	 * @return the recordCounter
 	 */
@@ -56,13 +58,12 @@ public class SynchronousBroker<T> implements Broker<T> {
 	 * @param item
 	 */
 	public void publish(T item)	{
-		//System.out.println("record: " + item);
-		//System.out.println("t: " + Thread.currentThread() + "\n");
-		/////////processNewRecord(item);
-		this.recordCounter += 1;
+
 		for(Subscriber s : this.subscribied)	{
 			s.onEvent(item);
-			//System.out.println("here");
+		}
+		synchronized(this)	{
+			this.recordCounter += 1;
 		}
 
 
@@ -72,18 +73,18 @@ public class SynchronousBroker<T> implements Broker<T> {
 	 * processNewRecord method implements update of Review DataStores for each new Record
 	 * @param newRecord
 	 */
-//	private synchronized void processNewRecord(T newRecord)	{
-//
-//		//this.dispatcher.put(newRecord);
-//		
-//		//T item = this.dispatcher.take();
-//		this.recordCounter += 1;
-//		for(Subscriber s : this.subscribied)	{
-//			s.onEvent(newRecord);
-//			//System.out.println("here");
-//		}
-//		
-//	}
+	//	private synchronized void processNewRecord(T newRecord)	{
+	//
+	//		//this.dispatcher.put(newRecord);
+	//		
+	//		//T item = this.dispatcher.take();
+	//		this.recordCounter += 1;
+	//		for(Subscriber s : this.subscribied)	{
+	//			s.onEvent(newRecord);
+	//			//System.out.println("here");
+	//		}
+	//		
+	//	}
 
 	//public synchronized T takeFromDispatcher()	{
 	//	return this.dispatcher.take();
@@ -100,7 +101,7 @@ public class SynchronousBroker<T> implements Broker<T> {
 	 */
 	public void subscribe(Subscriber<T> subs) {
 		this.subscribied.add(subs);
-		
+
 	}
 
 

@@ -38,7 +38,7 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	public static AsyncUnorderedBroker getInstance()	{
 		return INSTANCE;
 	}
-	
+
 	public static synchronized AsyncUnorderedBroker getInstance(int poolSize)	{
 		if(INSTANCE == null)	{
 			INSTANCE = new AsyncUnorderedBroker<Reviews>(poolSize);
@@ -53,7 +53,7 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 		return SubscriberList;
 	}
 
-	
+
 	/**
 	 * initializeHelperPool method creates a threadpool of helpers
 	 * @param poolSize
@@ -79,10 +79,12 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	 * @param item
 	 */ 
 	public void publish(T item)	{
-			helperPool.execute(new AsyncUnOrderedBrokerHelper(item, this.SubscriberList));
+		helperPool.execute(new AsyncUnOrderedBrokerHelper(item, this.SubscriberList));
+		synchronized(this)	{
 			this.recordCounter += 1;
+		}
 	}
-	
+
 
 	/**
 	 * Called once by each subscriber. Subscriber will be 
@@ -108,13 +110,13 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 
 		this.helperPool.shutdown();
 
-			try {
-				while(!this.helperPool.awaitTermination(10, TimeUnit.SECONDS))	{
-					System.out.println("awaiting termination");
-				}
-			} catch (InterruptedException e) {
-				System.out.println("Error in closing helper pool");
+		try {
+			while(!this.helperPool.awaitTermination(10, TimeUnit.SECONDS))	{
+				System.out.println("awaiting termination");
 			}
+		} catch (InterruptedException e) {
+			System.out.println("Error in closing helper pool");
+		}
 	}
 
 

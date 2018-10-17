@@ -11,9 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class AmazonItem {
 
-	protected transient int itemId;
-	private transient volatile static int itemCount = 0; 
-	//private ReentrantLock lock = new ReentrantLock();
+	protected int itemId;
+	private transient volatile static int itemCount = 0;
 
 	/**
 	 * constructor
@@ -27,12 +26,10 @@ public abstract class AmazonItem {
 	/**
 	 * incrementCount method increments the recordCounter and assigns the value to itemId
 	 */
-	private synchronized void incrementCount()	{ //synchronized
-		//lock.lock();
-		AmazonItem.itemCount = AmazonItem.itemCount + 1;
-		this.itemId = AmazonItem.itemCount;
-		//System.out.println("itemId: " + this.itemId);
-		//lock.unlock();
+	private synchronized void incrementCount()	{
+		
+		itemCount = itemCount + 1;
+		this.itemId = itemCount;
 	}
 
 
