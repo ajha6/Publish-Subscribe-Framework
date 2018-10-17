@@ -23,16 +23,17 @@ import item.Reviews;
  */
 public class Project2InitReader {
 
-	private static Project2Init initProject2= null;
+	private static Project2Init initProject2 = null;
+	
 	
 	/**
 	 * jsonFileReader process Review file and then notifies DataStore 
 	 * @param inputFile
 	 */
-	public static Project2Init project2InitjsonReader()	{
+	public static Project2Init project2InitjsonReader(String file)	{
 
 		JsonParser parser = new JsonParser();
-		Path path = Paths.get("project2Init.json");	
+		Path path = Paths.get(file);	
 		
 
 		try(
@@ -41,15 +42,16 @@ public class Project2InitReader {
 			String line;
 			//System.out.println("Processing " + "project2Init.json" + " file.");
 
-			while((line = reader.readLine()) != null)	{
+			//while((line = reader.readLine()) != null)	{
+			if((line = reader.readLine()) != null)	{
 				try {
 					//parses each line into JsonObject
 					JsonObject object =  parser.parse(line).getAsJsonObject();
-					//creates AmazonReviews object from the Json Object 
+					//creates initProject2 object from the Json Object 
 					initProject2 = new Gson().fromJson(object, Project2Init.class);
 
 				} catch(JsonSyntaxException jse)	{
-					System.out.println("Skipping line ...");
+					System.out.println("Project2 init reader - Skipping line ...");
 				}
 			}	
 
@@ -72,8 +74,8 @@ public class Project2InitReader {
 		// TODO Auto-generated method stub
 		
 		
-		Project2Init init = Project2InitReader.project2InitjsonReader();
-		System.out.println("init: " + init);
+		//Project2Init init = Project2InitReader.project2InitjsonReader();
+		//System.out.println("init: " + init);
 
 	}
 

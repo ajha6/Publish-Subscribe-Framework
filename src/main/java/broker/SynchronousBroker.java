@@ -55,7 +55,7 @@ public class SynchronousBroker<T> implements Broker<T> {
 	 * 
 	 * @param item
 	 */
-	public synchronized void publish(T item)	{
+	public void publish(T item)	{
 		//System.out.println("record: " + item);
 		//System.out.println("t: " + Thread.currentThread() + "\n");
 		/////////processNewRecord(item);

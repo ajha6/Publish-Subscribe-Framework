@@ -19,14 +19,6 @@ public class Project2Logger {
 	private static Logger logger; 
 	private static FileHandler logHandler;
 	private static SimpleFormatter readableFormat = new SimpleFormatter();
-	
-
-	/**
-	 * @return the logger
-	 */
-	public Logger getLogger() {
-		return logger;
-	}
 
 
 	public static void initialize(String logName, String logFile)	{
@@ -58,7 +50,12 @@ public class Project2Logger {
 	}
 	
 	
-	
+	/**
+	 * @return the logger
+	 */
+	public Logger getLogger() {
+		return logger;
+	}
 
 
 	/**

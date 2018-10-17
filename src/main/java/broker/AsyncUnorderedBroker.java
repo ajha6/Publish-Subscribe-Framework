@@ -8,78 +8,58 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import cs601.project2.Project2Init;
 import item.Reviews;
 import subscriber.Subscriber;
 
 /**
  * @author anuragjha
- *
+ * AsyncUnorderedBroker class implements Asynchronous unordered Broker 
+ * @param <T>
  */
 public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable { 
 
 	private static AsyncUnorderedBroker INSTANCE;
 
-	private LinkedList<Subscriber> subscribied = new LinkedList<Subscriber>();
+	private LinkedList<Subscriber> SubscriberList; 
 
-	ExecutorService helperPool;
+	private ExecutorService helperPool;
+	private int poolSize;
 
-	private int recordCounter = 0;
-	//private boolean isReadComplete = false;
-	//private boolean isWriteComplete = false;
-	//private int maxQueueSize = 0;
-
-	/**
-	 * @return the dispatcher
-	 */
-	//public CircularBlockingQueue<T> getDispatcher() {
-	//	return dispatcher;
-	//}
-
-	/**
-	 * @return the newItem
-	 */
-	//public synchronized T getNewItem() {
-	//	return newItem;
-	//}
-
-	/**
-	 * @param newItem the newItem to set
-	 */
-	//public synchronized void setNewItem(T newItem) {
-	//	this.newItem = newItem;
-	//}
-
-	/**
-	 * @return the subscribied
-	 */
-	public LinkedList<Subscriber> getSubscribied() {
-		return subscribied;
-	}
-
-
-
-
-
-	//private AsyncOrderedBrokerHelper helper = new AsyncOrderedBrokerHelper();
+	private int recordCounter;
 
 	//constructor
-	private AsyncUnorderedBroker()	{
+	private AsyncUnorderedBroker(int poolSize)	{
+		this.SubscriberList = new LinkedList<Subscriber>();
+		this.recordCounter = 0;
+		this.poolSize = poolSize;
 	}
 
-	public static synchronized AsyncUnorderedBroker getInstance()	{
+	public static AsyncUnorderedBroker getInstance()	{
+		return INSTANCE;
+	}
+	
+	public static synchronized AsyncUnorderedBroker getInstance(int poolSize)	{
 		if(INSTANCE == null)	{
-			INSTANCE = new AsyncUnorderedBroker<Reviews>();
+			INSTANCE = new AsyncUnorderedBroker<Reviews>(poolSize);
 		}
 		return INSTANCE;
 	}
 
-	public synchronized void initializeHelperPool(int poolSize)	{
-		//System.out.println("async unordered broker Initial thread count : " + Thread.activeCount());
+	/**
+	 * @return the SubscriberList
+	 */
+	public LinkedList<Subscriber> SubscriberList() {
+		return SubscriberList;
+	}
+
+	
+	/**
+	 * initializeHelperPool method creates a threadpool of helpers
+	 * @param poolSize
+	 */
+	public void initializeHelperPool(int poolSize)	{
 		this.helperPool = Executors.newFixedThreadPool(poolSize);
-		//for(int i = 1; i <= poolSize; i++)	{
-		//	helperPool.execute(new AsyncUnOrderedBrokerHelper());
-		//}
-		//System.out.println("async unordered broker Initial thread count : " + Thread.activeCount());
 
 	}
 
@@ -91,26 +71,6 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 		return recordCounter;
 	}
 
-	//public int getMaxQueueSize()	{
-	//	return this.maxQueueSize;
-	//}
-
-
-	/**
-	 * @param isReadComplete the isReadComplete to set
-	 */
-	//public void setReadComplete(boolean isReadComplete) {
-	//	this.isReadComplete = isReadComplete;
-	//}
-
-
-	/**
-	 * @return the isWriteComplete
-	 */
-	//public boolean isWriteComplete() {
-	//	return isWriteComplete;
-	//}
-
 
 	/**
 	 * Called by a publisher to publish a new item. The 
@@ -118,39 +78,11 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	 * 
 	 * @param item
 	 */ 
-	public synchronized void publish(T item)	{
-		this.recordCounter += 1;
-		helperPool.execute(new AsyncUnOrderedBrokerHelper(item, this.subscribied));
+	public void publish(T item)	{
+			helperPool.execute(new AsyncUnOrderedBrokerHelper(item, this.SubscriberList));
+			this.recordCounter += 1;
 	}
 	
-	/**
-	public synchronized void publish(T item)	{
-		//System.out.println("record: " + item);
-		//System.out.println("t: " + Thread.currentThread() + "\n");
-		//processNewRecord(item);
-
-		//System.out.println("async unordered broker current thread : " + Thread.currentThread());
-		this.dispatcher.put(item);
-		//this.newItem = item;
-		this.recordCounter += 1;
-		helperPool.execute(new AsyncUnOrderedBrokerHelper());
-
-		// threadpool.execute(helperThread);
-
-
-
-	}
-**/
-
-	/**
-	 * 
-	 * @param
-	 */
-	public int threadCount()	{
-		return Thread.activeCount();
-
-	}
-
 
 	/**
 	 * Called once by each subscriber. Subscriber will be 
@@ -159,8 +91,8 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	 * 
 	 * @param subscriber
 	 */
-	public synchronized void subscribe(Subscriber<T> subscriber)	{
-		this.subscribied.add(subscriber);
+	public void subscribe(Subscriber<T> subscriber)	{
+		this.SubscriberList.add(subscriber);
 	}
 
 
@@ -170,29 +102,26 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	 * The method will block until all items that have been
 	 * published have been delivered to all subscribers.
 	 */
-	public synchronized void shutdown()	{
-		System.out.println("shutting down Async Broker");
-		System.out.println(Thread.activeCount());
+	public void shutdown()	{
+		System.out.println("shutting down Async Unordered Broker");
+		//System.out.println(Thread.activeCount());
 
 		this.helperPool.shutdown();
 
-		//if(this.helperPool.isTerminated())	{
 			try {
-				while(!this.helperPool.awaitTermination(1, TimeUnit.MINUTES))	{
+				while(!this.helperPool.awaitTermination(10, TimeUnit.SECONDS))	{
 					System.out.println("awaiting termination");
 				}
 			} catch (InterruptedException e) {
 				System.out.println("Error in closing helper pool");
 			}
-		//}
-		//this.isWriteComplete = true;
 	}
 
 
 	@Override
 	public void run() {
 
-		this.initializeHelperPool(9);
+		this.initializeHelperPool(this.poolSize);
 
 	}
 

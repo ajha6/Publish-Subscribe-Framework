@@ -23,7 +23,7 @@ public class Reviews extends AmazonItem {
 	private String reviewTime;
 
 	//variable to understand if the review is new or old
-	private boolean isNew;
+	private transient boolean isNew;
 
 
 	/**

@@ -7,6 +7,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.google.gson.Gson;
+
 import item.Reviews;
 
 /**
@@ -15,52 +17,45 @@ import item.Reviews;
  */
 public class Subscribers1<T> implements Subscriber<T> {
 
-	private static int subsCount = 0;
+	private int recordCount;
 	
-	private int subscriberId;
-	private String filter;
-	
+	private String filter;	
 	private FileOutput outputFile;
-	private BufferedWriter bw = null;
+	private BufferedWriter bw;
 	private FileWriter fw;
-	
-	public int recordCount = 0;
-	//private boolean firstItemReceived = false;
-	//private boolean isOnEvent;
-	//private T item;
-	
-//	public Subscribers1()	{
-//		count += 1;
-//		subscriberId = count;
-//		outputFile = new FileOutput("outFile"+subscriberId+".txt");
-//
-//	}
+	//Gson gson;
+		
 
 	/**
 	 * subscriber constructor
 	 * @param filter
 	 */
-	public Subscribers1(String filter)	{
-		subsCount += 1;
-		this.subscriberId = subsCount;
-		this.outputFile = new FileOutput("outFile"+subscriberId+".txt");
+	public Subscribers1(String filter, String file)	{
+		this.outputFile = new FileOutput(file);
 		this.filter = filter;
+		this.recordCount = 0;
+		this.bw = null;
+		//this.gson = new Gson();
+		//opens a File to write the results
 		this.openWriter();
 
 	}
 	
 	/**
-	 * openWriter methods opens writers to be used in writing to a file
+	 * @return the recordCount
+	 */
+	public int getRecordCount() {
+		return recordCount;
+	}
+	
+	/**
+	 * openWriter methods opens writers to be used for writing to a file
 	 */
 	private void openWriter() {
 		
 		try {
 			fw = new FileWriter(outputFile.getFile(),true);
 			bw = new BufferedWriter(fw);
-			//bw.write(mycontent); 
-			////////bw.append(mycontent);    
-			//System.out.println("File written Successfully");
-			
 		}
 		catch (IOException ioe) {
 			System.out.println(ioe.getMessage() );
@@ -90,7 +85,7 @@ public class Subscribers1<T> implements Subscriber<T> {
 	 * has been published.
 	 * @param item
 	 */
-	public synchronized void onEvent(T item)	{		
+	public void onEvent(T item)	{		
 		toOutput(item);
 		
 	}
@@ -100,14 +95,21 @@ public class Subscribers1<T> implements Subscriber<T> {
 	 * toOutput method writes the record into output file of Subscriber
 	 * @param item
 	 */
-	private synchronized void toOutput(T item)	{
+	private void toOutput(T item)	{
 		//System.out.println("current thread in subscriber: " + Thread.currentThread().getName());
 		if(this.filter.matches("new") && ((Reviews)item).isNew())	{
-			outputFile.addContent(item.toString(), bw);
-			this.recordCount += 1;
+			outputFile.addContent(new Gson().toJson(item)+"\n", bw);
+			synchronized(this)	{
+				
+				this.recordCount += 1;
+			}
+			
 		} else if(this.filter.matches("old") && !((Reviews)item).isNew())	{
-			outputFile.addContent(item.toString(), bw);
-			this.recordCount += 1;
+			outputFile.addContent(new Gson().toJson(item)+"\n", bw);
+			synchronized(this)	{
+				
+				this.recordCount += 1;
+			}
 		}
 	}
 

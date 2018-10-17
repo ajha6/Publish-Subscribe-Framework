@@ -36,4 +36,10 @@ public interface Broker<T> {
 	 * published have been delivered to all subscribers.
 	 */
 	public void shutdown();
+	
+	/**
+	 * method to return the number of records read by Broker
+	 * @return
+	 */
+	public int getRecordCounter();
 }

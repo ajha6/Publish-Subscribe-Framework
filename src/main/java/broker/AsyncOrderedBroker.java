@@ -5,32 +5,49 @@ import java.util.LinkedList;
 import item.Reviews;
 import subscriber.Subscriber;
 
+/**
+ * @author anuragjha
+ * AsyncOrderedBroker class implements Asynchronous ordered broker
+ * @param <T>
+ */
 public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 
 	private static AsyncOrderedBroker INSTANCE;
 	
-	public LinkedList<Subscriber> subscriberList = new LinkedList<Subscriber>();
-	private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(1000);
+	public LinkedList<Subscriber> subscriberList; 
+	private CircularBlockingQueue<T> dispatcher; 
 	
-	private AsyncOrderedBrokerHelper helper = new AsyncOrderedBrokerHelper();
-	Thread helperThread;
+	private AsyncOrderedBrokerHelper helper; 
+	private Thread helperThread;
 	
-	private int recordCounter = 0;
+	private int recordCounter; 
 	
-	//constructor
-	private AsyncOrderedBroker()	{
+	/**
+	 * constructor - initializes the resources needed
+	 */
+	private AsyncOrderedBroker(int queueSize)	{
+		this.subscriberList = new LinkedList<Subscriber>();
+		this.dispatcher = new CircularBlockingQueue<T>(queueSize);
+		this.helper = new AsyncOrderedBrokerHelper();
+		this.recordCounter = 0;		
 	}
 	
+	
 	public static synchronized AsyncOrderedBroker getInstance()	{
-		if(INSTANCE == null)	{
-			INSTANCE = new AsyncOrderedBroker<Reviews>();
-		}
 		return INSTANCE;
 	}
 	
 	
+	public static synchronized AsyncOrderedBroker getInstance(int queueSize)	{
+		if(INSTANCE == null)	{
+			
+			INSTANCE = new AsyncOrderedBroker<Reviews>(queueSize);
+		}
+		return INSTANCE;
+	}
+	
 	/**
-	 * @return the subscribied
+	 * @return the subscriberList
 	 */
 	public LinkedList<Subscriber> getSubscriberList() {
 		return subscriberList;
@@ -59,7 +76,7 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	 * 
 	 * @param item
 	 */
-	public synchronized void publish(T item)	{
+	public void publish(T item)	{
 		this.dispatcher.put(item);
 		this.recordCounter += 1;
 	}
@@ -72,7 +89,7 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	 * 
 	 * @param subscriber
 	 */
-	public synchronized void subscribe(Subscriber<T> subscriber)	{
+	public void subscribe(Subscriber<T> subscriber)	{
 		this.subscriberList.add(subscriber);
 	}
 	
@@ -83,22 +100,22 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	 * The method will block until all items that have been
 	 * published have been delivered to all subscribers.
 	 */
-	public synchronized void shutdown()	{
-		try {
-			this.helperThread.join();
-		} catch(InterruptedException ie)	{
-			System.out.println("helper join incomplete");
+	public void shutdown()	{
+		System.out.println("shutting down Async Ordered Broker");
+		try	{
+		this.helperThread.join();
+		}catch(InterruptedException ie)	{
+			System.out.println("Error in closing helper thread");
 		}
 	}
 	
-	
+	/**
+	 * run method creates and starts new helper thread
+	 */
 	public void run()	{
 		
 		this.helperThread = new Thread(new AsyncOrderedBrokerHelper());
 		this.helperThread.start();
-		
-
-		
 		
 		
 	}

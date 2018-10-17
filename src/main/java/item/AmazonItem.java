@@ -11,8 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class AmazonItem {
 
-	protected int itemId;
-	private volatile static int itemCount = 0; 
+	protected transient int itemId;
+	private transient volatile static int itemCount = 0; 
 	//private ReentrantLock lock = new ReentrantLock();
 
 	/**

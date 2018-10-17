@@ -10,22 +10,16 @@ import java.io.IOException;
 
 /**
  * @author anuragjha
- *
+ * FileOutput class handles creating and writing to a file
  */
 public class FileOutput {
 
 	File file;
-	///BufferedWriter bw = null;
-	//FileWriter fw;
-
+	
 	/**
-	 * @return the file
+	 * constructor - creates a new file
+	 * @param outFile
 	 */
-	public File getFile() {
-		return file;
-	}
-
-
 	public FileOutput(String outFile)	{
 		this.file = new File(outFile);
 
@@ -44,29 +38,26 @@ public class FileOutput {
 		}
 
 	}
+	
+
+	/**
+	 * @return the file
+	 */
+	public File getFile() {
+		return file;
+	}
 
 
 	/**
-	 * The method takes the filename and content as params and generates a file with the 
+	 * The method takes content and pointer to a file as params and appends the
 	 * specified content
 	 * @param outFile
 	 * @param mycontent
-	 * @return true/false
 	 */
 	public synchronized void addContent(String mycontent, BufferedWriter bw)	{
 
-		//////////////BufferedWriter bw = null;
-		//FileWriter fw;
-
 		try {
-
-
-			/////////FileWriter fw = new FileWriter(this.file,true);
-			/////////bw = new BufferedWriter(fw);
-			//bw.write(mycontent); 
 			bw.append(mycontent);    
-			//System.out.println("File written Successfully");
-
 		}
 		catch (IOException ioe) {
 			System.out.println(ioe.getMessage() );
