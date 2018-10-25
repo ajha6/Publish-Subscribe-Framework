@@ -19,9 +19,9 @@ import subscriber.Subscriber;
  */
 public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable { 
 
-	private static AsyncUnorderedBroker INSTANCE;
+	//private static AsyncUnorderedBroker INSTANCE;
 
-	private LinkedList<Subscriber> SubscriberList; 
+	private LinkedList<Subscriber> subscriberList; 
 
 	private ExecutorService helperPool;
 	private int poolSize;
@@ -29,28 +29,28 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	private int recordCounter;
 
 	//constructor
-	private AsyncUnorderedBroker(int poolSize)	{
-		this.SubscriberList = new LinkedList<Subscriber>();
+	public AsyncUnorderedBroker(int poolSize)	{
+		this.subscriberList = new LinkedList<Subscriber>();
 		this.recordCounter = 0;
 		this.poolSize = poolSize;
 	}
 
-	public static AsyncUnorderedBroker getInstance()	{
-		return INSTANCE;
-	}
-
-	public static synchronized AsyncUnorderedBroker getInstance(int poolSize)	{
-		if(INSTANCE == null)	{
-			INSTANCE = new AsyncUnorderedBroker<Reviews>(poolSize);
-		}
-		return INSTANCE;
-	}
+//	public static AsyncUnorderedBroker getInstance()	{
+//		return INSTANCE;
+//	}
+//
+//	public static synchronized AsyncUnorderedBroker getInstance(int poolSize)	{
+//		if(INSTANCE == null)	{
+//			INSTANCE = new AsyncUnorderedBroker<Reviews>(poolSize);
+//		}
+//		return INSTANCE;
+//	}
 
 	/**
 	 * @return the SubscriberList
 	 */
 	public LinkedList<Subscriber> SubscriberList() {
-		return SubscriberList;
+		return subscriberList;
 	}
 
 
@@ -79,7 +79,7 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	 * @param item
 	 */ 
 	public void publish(T item)	{
-		helperPool.execute(new AsyncUnOrderedBrokerHelper(item, this.SubscriberList));
+		helperPool.execute(new AsyncUnOrderedBrokerHelper(item, this.subscriberList));
 		synchronized(this)	{
 			this.recordCounter += 1;
 		}
@@ -94,7 +94,7 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	 * @param subscriber
 	 */
 	public void subscribe(Subscriber<T> subscriber)	{
-		this.SubscriberList.add(subscriber);
+		this.subscriberList.add(subscriber);
 	}
 
 

@@ -12,12 +12,12 @@ import subscriber.Subscriber;
  */
 public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 
-	private static AsyncOrderedBroker INSTANCE;
+//	private static AsyncOrderedBroker INSTANCE;
 
 	public LinkedList<Subscriber> subscriberList; 
 	private CircularBlockingQueue<T> dispatcher; 
 
-	private AsyncOrderedBrokerHelper helper; 
+//	private AsyncOrderedBrokerHelper helper; 
 	private Thread helperThread;
 
 	private int recordCounter; 
@@ -25,26 +25,26 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	/**
 	 * constructor - initializes the resources needed
 	 */
-	private AsyncOrderedBroker(int queueSize)	{
+	public AsyncOrderedBroker(int queueSize)	{
 		this.subscriberList = new LinkedList<Subscriber>();
 		this.dispatcher = new CircularBlockingQueue<T>(queueSize);
-		this.helper = new AsyncOrderedBrokerHelper();
-		this.recordCounter = 0;		
+		this.recordCounter = 0;	
+//		this.helper = new AsyncOrderedBrokerHelper();
 	}
 
 
-	public static synchronized AsyncOrderedBroker getInstance()	{
-		return INSTANCE;
-	}
+//	public static synchronized AsyncOrderedBroker getInstance()	{
+//		return INSTANCE;
+//	}
 
 
-	public static synchronized AsyncOrderedBroker getInstance(int queueSize)	{
-		if(INSTANCE == null)	{
-
-			INSTANCE = new AsyncOrderedBroker<Reviews>(queueSize);
-		}
-		return INSTANCE;
-	}
+//	public static synchronized AsyncOrderedBroker getInstance(int queueSize)	{
+//		if(INSTANCE == null)	{
+//
+//			INSTANCE = new AsyncOrderedBroker<Reviews>(queueSize);
+//		}
+//		return INSTANCE;
+//	}
 
 	/**
 	 * @return the subscriberList
@@ -116,7 +116,7 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	 */
 	public void run()	{
 
-		this.helperThread = new Thread(new AsyncOrderedBrokerHelper());
+		this.helperThread = new Thread(new AsyncOrderedBrokerHelper(this));
 		this.helperThread.start();
 
 

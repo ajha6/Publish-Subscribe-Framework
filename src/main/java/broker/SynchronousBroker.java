@@ -15,27 +15,25 @@ import subscriber.Subscribers1;
  */
 public class SynchronousBroker<T> implements Broker<T> { 
 
-	private static SynchronousBroker INSTANCE;
+//	private static SynchronousBroker INSTANCE;
 
 	private LinkedList<Subscriber> subscribied;
-
-	//private CircularBlockingQueue<T> dispatcher = new CircularBlockingQueue<T>(1);
 
 	private int recordCounter;
 	//private boolean isReadComplete = false;
 
 	//constructor
-	private SynchronousBroker()	{
+	public SynchronousBroker()	{
 		this.subscribied = new LinkedList<Subscriber>();
 		this.recordCounter = 0;
 	}
 
-	public static synchronized SynchronousBroker getInstance()	{
-		if(INSTANCE == null)	{
-			INSTANCE = new SynchronousBroker<Reviews>();
-		}
-		return INSTANCE;
-	}
+//	public static synchronized SynchronousBroker getInstance()	{
+//		if(INSTANCE == null)	{
+//			INSTANCE = new SynchronousBroker<Reviews>();
+//		}
+//		return INSTANCE;
+//	}
 
 	/**
 	 * @param isReadComplete the isReadComplete to set
@@ -68,28 +66,6 @@ public class SynchronousBroker<T> implements Broker<T> {
 
 
 	}
-
-	/**
-	 * processNewRecord method implements update of Review DataStores for each new Record
-	 * @param newRecord
-	 */
-	//	private synchronized void processNewRecord(T newRecord)	{
-	//
-	//		//this.dispatcher.put(newRecord);
-	//		
-	//		//T item = this.dispatcher.take();
-	//		this.recordCounter += 1;
-	//		for(Subscriber s : this.subscribied)	{
-	//			s.onEvent(newRecord);
-	//			//System.out.println("here");
-	//		}
-	//		
-	//	}
-
-	//public synchronized T takeFromDispatcher()	{
-	//	return this.dispatcher.take();
-
-	//}
 
 
 	/**
