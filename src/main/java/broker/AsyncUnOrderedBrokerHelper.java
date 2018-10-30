@@ -1,22 +1,24 @@
 package broker;
 
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import subscriber.Subscriber;
 
 public class AsyncUnOrderedBrokerHelper<T> implements Runnable {
 
 	private T newItem;
-	private LinkedList<Subscriber> subscribers;
+//	private LinkedList<Subscriber> subscribers;
+	private ConcurrentLinkedQueue<Subscriber<T>> subscribers;
 	
-	public AsyncUnOrderedBrokerHelper(T item, LinkedList<Subscriber> subscribers )	{
+	public AsyncUnOrderedBrokerHelper(T item, ConcurrentLinkedQueue<Subscriber<T>> subscribers ) {
 		this.newItem = item;
 		this.subscribers = subscribers;
 	}
 	
-	public void run()	{
+	public void run() {
 		
-		for(Subscriber s : this.subscribers)	{
+		for(Subscriber s : this.subscribers) {
 
 			s.onEvent(this.newItem);
 		}

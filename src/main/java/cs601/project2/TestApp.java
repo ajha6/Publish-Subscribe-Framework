@@ -3,7 +3,6 @@
  */
 package cs601.project2;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.logging.Level;
 
@@ -30,39 +29,39 @@ public class TestApp {
 		Project2Logger.write(Level.INFO, ""+ init.toString(), 0);
 	}
 
-	private Subscribers1[] createSubscriberNew()	{
+	private Subscribers1[] createSubscriberNew() {
 		Subscribers1[] subscribersNew = new Subscribers1[init.getSubscribersNew().length];
 		for(int i = 1; i <= init.getSubscribersNew().length; i++)	{
-			subscribersNew[i-1]  = new Subscribers1("new", init.getSubscribersNew()[i-1]);
+			subscribersNew[i-1]  = new Subscribers1<>("new", init.getSubscribersNew()[i-1]);
 		}
 		return subscribersNew;
 	}
 
-	private Subscribers1[] createSubscriberOld()	{
+	private Subscribers1[] createSubscriberOld() {
 		Subscribers1[] subscribersOld = new Subscribers1[init.getSubscribersOld().length];
 		for(int i = 1; i <= init.getSubscribersOld().length; i++)	{
-			subscribersOld[i-1] = new Subscribers1("old", init.getSubscribersOld()[i-1]);
+			subscribersOld[i-1] = new Subscribers1<>("old", init.getSubscribersOld()[i-1]);
 		}
 		return subscribersOld;
 	}
 
-	private Broker initializeBroker()	{
+	private Broker initializeBroker() {
 		Broker broker = null;
-		switch(init.getBrokerType()) 	{		
+		switch(init.getBrokerType()) {		
 		case "sync" : 
-//			broker = SynchronousBroker.getInstance();
-			broker = new SynchronousBroker();
+			//			broker = SynchronousBroker.getInstance();
+			broker = new SynchronousBroker<>();
 			return broker;
 		case "asyncOrdered" :
 			int queueSize = init.getQueueSize();
-//			broker = AsyncOrderedBroker.getInstance(queueSize);
-			broker = new AsyncOrderedBroker(queueSize);
+			//			broker = AsyncOrderedBroker.getInstance(queueSize);
+			broker = new AsyncOrderedBroker<>(queueSize);
 			Project2Logger.write(Level.INFO, "QueueSize: "+ init.getQueueSize() + "\n", 0);
 			return broker;
 		case "asyncUnordered" :
 			int poolSize = init.getPoolSize();
-//			broker = AsyncUnorderedBroker.getInstance(poolSize);
-			broker = new AsyncUnorderedBroker(poolSize);
+			//			broker = AsyncUnorderedBroker.getInstance(poolSize);
+			broker = new AsyncUnorderedBroker<>(poolSize);
 			Project2Logger.write(Level.INFO, "PoolSize: "+ init.getPoolSize() + "\n", 0);
 			return broker;
 		default :
@@ -71,7 +70,7 @@ public class TestApp {
 		}
 	}
 
-	private void addSubscribers(Broker broker, Subscribers1[] subscribersNew, Subscribers1[] subscribersOld)	{
+	private void addSubscribers(Broker broker, Subscribers1[] subscribersNew, Subscribers1[] subscribersOld) {
 		for(Subscribers1 subs : subscribersNew) {
 			broker.subscribe(subs);
 		}
@@ -89,25 +88,25 @@ public class TestApp {
 		return publisherThreadList;
 	}
 
-	private Thread createBrokerThread(Broker broker)	{
+	private Thread createBrokerThread(Broker broker) {
 		Thread brokerThread = null;
-		if(init.getBrokerType().matches("asyncOrdered"))	{
+		if(init.getBrokerType().matches("asyncOrdered")) {
 			//creating broker thread
 			brokerThread = new Thread((AsyncOrderedBroker)broker);
-		} else if(init.getBrokerType().matches("asyncUnordered"))	{
+		} else if(init.getBrokerType().matches("asyncUnordered")) {
 			//creating broker thread
 			brokerThread = new Thread((AsyncUnorderedBroker)broker);
 		}
 		return brokerThread;
 	}
 
-	private void startPublisherThreads(LinkedList<Thread> publisherThreadList)	{
+	private void startPublisherThreads(LinkedList<Thread> publisherThreadList) {
 		for(Thread publisherThread: publisherThreadList) {
 			publisherThread.start();
 		}
 	}
 
-	private void joinPublisherThreads(LinkedList<Thread> publisherThreadList)	{
+	private void joinPublisherThreads(LinkedList<Thread> publisherThreadList) {
 		for(Thread publisherThread: publisherThreadList) {
 			try {
 				publisherThread.join();
@@ -121,16 +120,17 @@ public class TestApp {
 	}
 
 
-	private void closeBroker(Broker broker, Thread brokerThread)	{
+	private void closeBroker(Broker broker, Thread brokerThread) {
 
-		if(init.getBrokerType().matches("asyncOrdered") || init.getBrokerType().matches("asyncUnordered"))	{
+		if(init.getBrokerType().matches("asyncOrdered") || init.getBrokerType().matches("asyncUnordered")) {
 			broker.shutdown();
-			
+
 			try {
-					brokerThread.join();
+				brokerThread.join();
 			} catch (InterruptedException e) {
 				System.out.println("Error in closing broker");
 			}
+
 		}
 		System.out.println("Broker thread finished.");
 		Project2Logger.write(Level.INFO, "Broker thread finished.", 0);
@@ -169,7 +169,7 @@ public class TestApp {
 			//reading configuration file content into Project2Init object
 			init = Project2InitReader.project2InitjsonReader(args[0]);
 		}
-		else	{
+		else {
 			System.out.println("Unable to initialize, exiting system");
 			System.exit(1);
 		}
@@ -185,7 +185,7 @@ public class TestApp {
 
 		//initializing Broker
 		Broker broker;
-		if((broker = testApp.initializeBroker()) == null)	{
+		if((broker = testApp.initializeBroker()) == null) {
 			System.exit(1);
 		}
 

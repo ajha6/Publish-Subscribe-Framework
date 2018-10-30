@@ -5,9 +5,7 @@ package broker;
 
 import java.util.LinkedList;
 
-import item.Reviews;
 import subscriber.Subscriber;
-import subscriber.Subscribers1;
 
 /**
  * @author anuragjha
@@ -17,14 +15,14 @@ public class SynchronousBroker<T> implements Broker<T> {
 
 //	private static SynchronousBroker INSTANCE;
 
-	private LinkedList<Subscriber> subscribied;
+	private LinkedList<Subscriber<T>> subscribied;
 
 	private int recordCounter;
 	//private boolean isReadComplete = false;
 
 	//constructor
-	public SynchronousBroker()	{
-		this.subscribied = new LinkedList<Subscriber>();
+	public SynchronousBroker() {
+		this.subscribied = new LinkedList<Subscriber<T>>();
 		this.recordCounter = 0;
 	}
 
@@ -57,7 +55,7 @@ public class SynchronousBroker<T> implements Broker<T> {
 	 */
 	public void publish(T item)	{
 
-		for(Subscriber s : this.subscribied)	{
+		for(Subscriber<T> s : this.subscribied)	{
 			s.onEvent(item);
 		}
 		synchronized(this)	{
@@ -87,7 +85,7 @@ public class SynchronousBroker<T> implements Broker<T> {
 	 * The method will block until all items that have been
 	 * published have been delivered to all subscribers.
 	 */
-	public void shutdown()	{
+	public void shutdown() {
 
 	}
 

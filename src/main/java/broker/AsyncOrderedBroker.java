@@ -1,8 +1,8 @@
 package broker;
 
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import item.Reviews;
 import subscriber.Subscriber;
 
 /**
@@ -12,44 +12,51 @@ import subscriber.Subscriber;
  */
 public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 
-//	private static AsyncOrderedBroker INSTANCE;
+	//	private static AsyncOrderedBroker INSTANCE;
 
-	public LinkedList<Subscriber> subscriberList; 
+//	private LinkedList<Subscriber<T>> subscriberList; 
+	private ConcurrentLinkedQueue<Subscriber<T>> subscriberList; 
 	private CircularBlockingQueue<T> dispatcher; 
 
-//	private AsyncOrderedBrokerHelper helper; 
+	//	private AsyncOrderedBrokerHelper helper; 
 	private Thread helperThread;
 
 	private int recordCounter; 
+	
+	private volatile boolean shoulRun;
+
 
 	/**
 	 * constructor - initializes the resources needed
 	 */
-	public AsyncOrderedBroker(int queueSize)	{
-		this.subscriberList = new LinkedList<Subscriber>();
+	public AsyncOrderedBroker(int queueSize) {
+//		this.subscriberList = new LinkedList<Subscriber<T>>();
+		this.subscriberList = new ConcurrentLinkedQueue<Subscriber<T>>();
 		this.dispatcher = new CircularBlockingQueue<T>(queueSize);
 		this.recordCounter = 0;	
-//		this.helper = new AsyncOrderedBrokerHelper();
+		//		this.helper = new AsyncOrderedBrokerHelper();
+		this.shoulRun = true;
 	}
 
 
-//	public static synchronized AsyncOrderedBroker getInstance()	{
-//		return INSTANCE;
-//	}
+	//	public static synchronized AsyncOrderedBroker getInstance()	{
+	//		return INSTANCE;
+	//	}
 
 
-//	public static synchronized AsyncOrderedBroker getInstance(int queueSize)	{
-//		if(INSTANCE == null)	{
-//
-//			INSTANCE = new AsyncOrderedBroker<Reviews>(queueSize);
-//		}
-//		return INSTANCE;
-//	}
+	//	public static synchronized AsyncOrderedBroker getInstance(int queueSize)	{
+	//		if(INSTANCE == null)	{
+	//
+	//			INSTANCE = new AsyncOrderedBroker<Reviews>(queueSize);
+	//		}
+	//		return INSTANCE;
+	//	}
 
 	/**
 	 * @return the subscriberList
 	 */
-	public LinkedList<Subscriber> getSubscriberList() {
+//	public LinkedList<Subscriber<T>> getSubscriberList() {
+	public ConcurrentLinkedQueue<Subscriber<T>> getSubscriberList() {
 		return subscriberList;
 	}
 
@@ -67,6 +74,14 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	 */
 	public int getRecordCounter() {
 		return recordCounter;
+	}
+	
+	
+	/**
+	 * @return the shoulRun
+	 */
+	public boolean isShoulRun() {
+		return shoulRun;
 	}
 
 
@@ -102,8 +117,11 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	 * The method will block until all items that have been
 	 * published have been delivered to all subscribers.
 	 */
-	public void shutdown()	{
+	public void shutdown() {
 		System.out.println("shutting down Async Ordered Broker");
+		
+		this.shoulRun = false; //setting shouldRun to false for AsyncOrderedBrokerHelper
+		
 		try	{
 			this.helperThread.join();
 		}catch(InterruptedException ie)	{
@@ -114,11 +132,10 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	/**
 	 * run method creates and starts new helper thread
 	 */
-	public void run()	{
+	public void run() {
 
 		this.helperThread = new Thread(new AsyncOrderedBrokerHelper(this));
 		this.helperThread.start();
-
 
 	}
 

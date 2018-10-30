@@ -20,7 +20,7 @@ public class FileOutput {
 	 * constructor - creates a new file
 	 * @param outFile
 	 */
-	public FileOutput(String outFile)	{
+	public FileOutput(String outFile) {
 		this.file = new File(outFile);
 
 		try	{
@@ -54,7 +54,7 @@ public class FileOutput {
 	 * @param outFile
 	 * @param mycontent
 	 */
-	public synchronized void addContent(String mycontent, BufferedWriter bw)	{
+	public synchronized void addContent(String mycontent, BufferedWriter bw) {
 
 		try {
 			bw.append(mycontent);    

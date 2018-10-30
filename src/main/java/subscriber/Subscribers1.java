@@ -67,12 +67,12 @@ public class Subscribers1<T> implements Subscriber<T> {
 	/**
 	 * closeWriter method closes the resources that is open for writing 
 	 */
-	public void closeWriter()	{
+	public void closeWriter() {
 		try{
-			if(bw != null)	{
+			if(bw != null) {
 				bw.close();
 			}
-			//if(fw != null)	{
+			//if(fw != null) {
 			//	fw.close();
 			//}
 		}catch(Exception e){
@@ -95,18 +95,18 @@ public class Subscribers1<T> implements Subscriber<T> {
 	 * toOutput method writes the record into output file of Subscriber
 	 * @param item
 	 */
-	private void toOutput(T item)	{
+	private void toOutput(T item) {
 		//System.out.println("current thread in subscriber: " + Thread.currentThread().getName());
-		if(this.filter.matches("new") && ((Reviews)item).isNew())	{
+		if(this.filter.matches("new") && ((Reviews)item).isNew()) {
 			outputFile.addContent(new Gson().toJson(item)+"\n", bw);
 			synchronized(this)	{
 				
 				this.recordCount += 1;
 			}
 			
-		} else if(this.filter.matches("old") && !((Reviews)item).isNew())	{
+		} else if(this.filter.matches("old") && !((Reviews)item).isNew()) {
 			outputFile.addContent(new Gson().toJson(item)+"\n", bw);
-			synchronized(this)	{
+			synchronized(this) {
 				
 				this.recordCount += 1;
 			}

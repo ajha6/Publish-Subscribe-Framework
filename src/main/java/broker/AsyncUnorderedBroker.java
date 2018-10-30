@@ -4,12 +4,11 @@
 package broker;
 
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import cs601.project2.Project2Init;
-import item.Reviews;
 import subscriber.Subscriber;
 
 /**
@@ -21,7 +20,8 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 
 	//private static AsyncUnorderedBroker INSTANCE;
 
-	private LinkedList<Subscriber> subscriberList; 
+	//private LinkedList<Subscriber<T>> subscriberList; 
+	private ConcurrentLinkedQueue<Subscriber<T>> subscriberList; 
 
 	private ExecutorService helperPool;
 	private int poolSize;
@@ -29,8 +29,9 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	private int recordCounter;
 
 	//constructor
-	public AsyncUnorderedBroker(int poolSize)	{
-		this.subscriberList = new LinkedList<Subscriber>();
+	public AsyncUnorderedBroker(int poolSize) {
+//		this.subscriberList = new LinkedList<Subscriber<T>>();
+		this.subscriberList = new ConcurrentLinkedQueue<Subscriber<T>>();
 		this.recordCounter = 0;
 		this.poolSize = poolSize;
 	}
@@ -49,7 +50,9 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	/**
 	 * @return the SubscriberList
 	 */
-	public LinkedList<Subscriber> SubscriberList() {
+//	public LinkedList<Subscriber<T>> SubscriberList() {
+	public ConcurrentLinkedQueue<Subscriber<T>> SubscriberList() {
+	
 		return subscriberList;
 	}
 
@@ -58,7 +61,7 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	 * initializeHelperPool method creates a threadpool of helpers
 	 * @param poolSize
 	 */
-	public void initializeHelperPool(int poolSize)	{
+	public void initializeHelperPool(int poolSize) {
 		this.helperPool = Executors.newFixedThreadPool(poolSize);
 
 	}
@@ -104,7 +107,7 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	 * The method will block until all items that have been
 	 * published have been delivered to all subscribers.
 	 */
-	public void shutdown()	{
+	public void shutdown() {
 		System.out.println("shutting down Async Unordered Broker");
 		//System.out.println(Thread.activeCount());
 

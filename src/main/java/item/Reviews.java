@@ -29,7 +29,7 @@ public class Reviews extends AmazonItem {
 	/**
 	 * Constructor - empty constructor for Gson
 	 */
-	public Reviews()	{
+	public Reviews() {
 
 	}
 
@@ -51,10 +51,10 @@ public class Reviews extends AmazonItem {
 	 * setIsNew method checks and sets the isNew state of Review
 	 */
 	private void setIsNew() {
-		if (this.unixReviewTime >= 1362268800)	{
+		if (this.unixReviewTime >= 1362268800) {
 			this.isNew = true;
 		}
-		else	{
+		else {
 			this.isNew = false;
 		}
 	}
@@ -72,7 +72,7 @@ public class Reviews extends AmazonItem {
 	 * toString method of Object class
 	 * @override
 	 */
-	public synchronized String toString()	{
+	public synchronized String toString() {
 		return "\n ItemId: "+ this.itemId +
 			 "\n\treviewerID: " + this.reviewerID
 				+ "\n\tasin: " + this.asin

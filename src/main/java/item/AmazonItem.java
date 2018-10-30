@@ -3,8 +3,6 @@
  */
 package item;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 /**
  * AmazonItem is base class for Reviews class
  * @author anuragjha
@@ -17,7 +15,7 @@ public abstract class AmazonItem {
 	/**
 	 * constructor
 	 */
-	public AmazonItem()	{
+	public AmazonItem() {
 		super();
 		this.incrementCount();
 	}
@@ -26,7 +24,7 @@ public abstract class AmazonItem {
 	/**
 	 * incrementCount method increments the recordCounter and assigns the value to itemId
 	 */
-	private synchronized void incrementCount()	{
+	private synchronized void incrementCount() {
 		
 		itemCount = itemCount + 1;
 		this.itemId = itemCount;

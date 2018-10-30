@@ -1,1 +1,1 @@
-{"brokerType": "sync", "loggerFile" : "project2LogFile.txt", "inputFiles": ["reviews_Apps_for_Android_5.json", "reviews_Home_and_Kitchen_5.json"], "subscribersNew": ["subs1NewOutFile"], "subscribersOld": ["subs2OldOutFile"], "queueSize": 200, "poolSize": 4}
+{"brokerType": "asyncUnordered", "loggerFile" : "project2LogFileSync.txt", "inputFiles": ["reviews_Apps_for_Android_5.json", "reviews_Home_and_Kitchen_5.json"], "subscribersNew": ["subs1NewOutFile"], "subscribersOld": ["subs2OldOutFile"], "queueSize": 100, "poolSize": 10}
