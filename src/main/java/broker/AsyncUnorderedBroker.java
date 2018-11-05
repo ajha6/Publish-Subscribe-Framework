@@ -17,10 +17,7 @@ import subscriber.Subscriber;
  * @param <T>
  */
 public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable { 
-
-	//private static AsyncUnorderedBroker INSTANCE;
-
-	//private LinkedList<Subscriber<T>> subscriberList; 
+	
 	private ConcurrentLinkedQueue<Subscriber<T>> subscriberList; 
 
 	private ExecutorService helperPool;
@@ -30,27 +27,14 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 
 	//constructor
 	public AsyncUnorderedBroker(int poolSize) {
-//		this.subscriberList = new LinkedList<Subscriber<T>>();
 		this.subscriberList = new ConcurrentLinkedQueue<Subscriber<T>>();
 		this.recordCounter = 0;
 		this.poolSize = poolSize;
 	}
 
-//	public static AsyncUnorderedBroker getInstance()	{
-//		return INSTANCE;
-//	}
-//
-//	public static synchronized AsyncUnorderedBroker getInstance(int poolSize)	{
-//		if(INSTANCE == null)	{
-//			INSTANCE = new AsyncUnorderedBroker<Reviews>(poolSize);
-//		}
-//		return INSTANCE;
-//	}
-
 	/**
 	 * @return the SubscriberList
 	 */
-//	public LinkedList<Subscriber<T>> SubscriberList() {
 	public ConcurrentLinkedQueue<Subscriber<T>> SubscriberList() {
 	
 		return subscriberList;
@@ -109,7 +93,6 @@ public class AsyncUnorderedBroker<T> implements Broker<T>,Runnable {
 	 */
 	public void shutdown() {
 		System.out.println("shutting down Async Unordered Broker");
-		//System.out.println(Thread.activeCount());
 
 		this.helperPool.shutdown();
 

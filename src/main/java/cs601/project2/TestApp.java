@@ -49,18 +49,17 @@ public class TestApp {
 		Broker broker = null;
 		switch(init.getBrokerType()) {		
 		case "sync" : 
-			//			broker = SynchronousBroker.getInstance();
 			broker = new SynchronousBroker<>();
 			return broker;
 		case "asyncOrdered" :
 			int queueSize = init.getQueueSize();
-			//			broker = AsyncOrderedBroker.getInstance(queueSize);
+			
 			broker = new AsyncOrderedBroker<>(queueSize);
 			Project2Logger.write(Level.INFO, "QueueSize: "+ init.getQueueSize() + "\n", 0);
 			return broker;
 		case "asyncUnordered" :
 			int poolSize = init.getPoolSize();
-			//			broker = AsyncUnorderedBroker.getInstance(poolSize);
+
 			broker = new AsyncUnorderedBroker<>(poolSize);
 			Project2Logger.write(Level.INFO, "PoolSize: "+ init.getPoolSize() + "\n", 0);
 			return broker;

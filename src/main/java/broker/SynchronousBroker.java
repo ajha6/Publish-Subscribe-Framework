@@ -13,32 +13,15 @@ import subscriber.Subscriber;
  */
 public class SynchronousBroker<T> implements Broker<T> { 
 
-//	private static SynchronousBroker INSTANCE;
-
 	private LinkedList<Subscriber<T>> subscribied;
 
 	private int recordCounter;
-	//private boolean isReadComplete = false;
 
 	//constructor
 	public SynchronousBroker() {
 		this.subscribied = new LinkedList<Subscriber<T>>();
 		this.recordCounter = 0;
 	}
-
-//	public static synchronized SynchronousBroker getInstance()	{
-//		if(INSTANCE == null)	{
-//			INSTANCE = new SynchronousBroker<Reviews>();
-//		}
-//		return INSTANCE;
-//	}
-
-	/**
-	 * @param isReadComplete the isReadComplete to set
-	 */
-	//public void setReadComplete(boolean isReadComplete) {
-	//	this.isReadComplete = isReadComplete;
-	//}
 
 	/**
 	 * @return the recordCounter

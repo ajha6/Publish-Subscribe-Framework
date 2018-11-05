@@ -100,7 +100,6 @@ public class Subscribers1<T> implements Subscriber<T> {
 		if(this.filter.matches("new") && ((Reviews)item).isNew()) {
 			outputFile.addContent(new Gson().toJson(item)+"\n", bw);
 			synchronized(this)	{
-				
 				this.recordCount += 1;
 			}
 			

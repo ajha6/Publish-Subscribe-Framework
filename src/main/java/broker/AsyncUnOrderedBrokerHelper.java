@@ -8,7 +8,6 @@ import subscriber.Subscriber;
 public class AsyncUnOrderedBrokerHelper<T> implements Runnable {
 
 	private T newItem;
-//	private LinkedList<Subscriber> subscribers;
 	private ConcurrentLinkedQueue<Subscriber<T>> subscribers;
 	
 	public AsyncUnOrderedBrokerHelper(T item, ConcurrentLinkedQueue<Subscriber<T>> subscribers ) {

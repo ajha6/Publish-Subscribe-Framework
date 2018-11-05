@@ -12,17 +12,13 @@ import subscriber.Subscriber;
  */
 public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 
-	//	private static AsyncOrderedBroker INSTANCE;
-
-//	private LinkedList<Subscriber<T>> subscriberList; 
 	private ConcurrentLinkedQueue<Subscriber<T>> subscriberList; 
 	private CircularBlockingQueue<T> dispatcher; 
 
-	//	private AsyncOrderedBrokerHelper helper; 
 	private Thread helperThread;
 
 	private int recordCounter; 
-	
+
 	private volatile boolean shoulRun;
 
 
@@ -30,32 +26,17 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	 * constructor - initializes the resources needed
 	 */
 	public AsyncOrderedBroker(int queueSize) {
-//		this.subscriberList = new LinkedList<Subscriber<T>>();
 		this.subscriberList = new ConcurrentLinkedQueue<Subscriber<T>>();
 		this.dispatcher = new CircularBlockingQueue<T>(queueSize);
-		this.recordCounter = 0;	
-		//		this.helper = new AsyncOrderedBrokerHelper();
+		this.recordCounter = 0;
+
 		this.shoulRun = true;
 	}
 
 
-	//	public static synchronized AsyncOrderedBroker getInstance()	{
-	//		return INSTANCE;
-	//	}
-
-
-	//	public static synchronized AsyncOrderedBroker getInstance(int queueSize)	{
-	//		if(INSTANCE == null)	{
-	//
-	//			INSTANCE = new AsyncOrderedBroker<Reviews>(queueSize);
-	//		}
-	//		return INSTANCE;
-	//	}
-
 	/**
 	 * @return the subscriberList
 	 */
-//	public LinkedList<Subscriber<T>> getSubscriberList() {
 	public ConcurrentLinkedQueue<Subscriber<T>> getSubscriberList() {
 		return subscriberList;
 	}
@@ -75,8 +56,8 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	public int getRecordCounter() {
 		return recordCounter;
 	}
-	
-	
+
+
 	/**
 	 * @return the shoulRun
 	 */
@@ -119,9 +100,9 @@ public class AsyncOrderedBroker<T> implements Broker<T>,Runnable {
 	 */
 	public void shutdown() {
 		System.out.println("shutting down Async Ordered Broker");
-		
+
 		this.shoulRun = false; //setting shouldRun to false for AsyncOrderedBrokerHelper
-		
+
 		try	{
 			this.helperThread.join();
 		}catch(InterruptedException ie)	{

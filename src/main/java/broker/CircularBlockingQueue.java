@@ -102,12 +102,11 @@ public class CircularBlockingQueue<T> {
 		startTime = System.currentTimeMillis();
 		while(this.size == 0) {
 			try	{
-				
+
 				this.wait(time);
 				if(this.size == 0) {
 					endTime = System.currentTimeMillis();
 					if((endTime - startTime) < time)	{
-						//this.wait(time - (endTime - startTime));
 						continue;
 					}else	{
 						return null;
