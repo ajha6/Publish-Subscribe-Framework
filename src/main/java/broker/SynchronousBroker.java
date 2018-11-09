@@ -4,6 +4,7 @@
 package broker;
 
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import subscriber.Subscriber;
 
@@ -13,13 +14,13 @@ import subscriber.Subscriber;
  */
 public class SynchronousBroker<T> implements Broker<T> { 
 
-	private LinkedList<Subscriber<T>> subscribied;
+	private ConcurrentLinkedQueue<Subscriber<T>> subscribied;
 
 	private int recordCounter;
 
 	//constructor
 	public SynchronousBroker() {
-		this.subscribied = new LinkedList<Subscriber<T>>();
+		this.subscribied = new ConcurrentLinkedQueue<Subscriber<T>>();
 		this.recordCounter = 0;
 	}
 
