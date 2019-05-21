@@ -9,8 +9,6 @@ For this project, you will implement a message broker framework that will suppor
 - Java Generics
 - Good design practices
 
-Note, this program does not require a significant amount of code, however you will be heavily graded on your design. You are also expected to spend a significant portion of time comparing the performance of the `Broker` implementations.
-
 This assignment has two parts:
 
 - Part 1 (95%) - Part 1 requires that you implement a program that will be run as a single Java process on one host. You will earn a maximum of 95% credit for completing the part 1 requirements. You *may* take advantage of [Project Resubmission as discussed on the Syllabus](https://cs601-f18.github.io/syllabus.html) if you meet all of the part 1 functionality requirements *even if you do not complete the part 2 functionality requirements*.
