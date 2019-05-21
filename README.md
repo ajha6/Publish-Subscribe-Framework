@@ -1,8 +1,6 @@
 Project 2 - Publish/Subscribe Framework
 =======================================
 
-### <del>Due - Monday, October 8, 2018 - 11am</del>
-### Due - Wednesday, October 17, 2018 - 11am
 
 For this project, you will implement a message broker framework that will support [publish/subscribe](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) functionality. You will practice using the following:
 
